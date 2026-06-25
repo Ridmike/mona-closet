@@ -53,8 +53,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               // Focus ring
               "focus:outline-none focus:ring-2",
               // Icon padding
-              leftIcon  && "pl-10",
-              rightIcon && "pr-10",
+              leftIcon ? "pl-10" : undefined,
+              rightIcon ? "pr-10" : undefined,
               // Disabled
               "disabled:bg-brand-sand/50 disabled:cursor-not-allowed disabled:opacity-70",
               className

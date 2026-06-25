@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
 
 /* ── Design Tokens ───────────────────────────────────────────── */
 :root {
@@ -19,6 +20,19 @@
 
   /* Transitions */
   --ease-brand: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-cormorant);
+  --color-background: var(--color-cream);
+  --color-foreground: var(--color-charcoal);
+  --text-display-xl: 3.75rem;
+  --text-display-xl--line-height: 1.1;
+  --text-display-lg: 3rem;
+  --text-display-lg--line-height: 1.1;
+  --text-display-md: 2.25rem;
+  --text-display-md--line-height: 1.15;
 }
 
 /* ── Base Reset ──────────────────────────────────────────────── */
@@ -44,14 +58,12 @@
   h2 { @apply text-display-lg; }
   h3 { @apply text-display-md; }
 
-  /* Focus ring for accessibility */
   :focus-visible {
     outline: 2px solid var(--color-mauve);
     outline-offset: 3px;
     border-radius: 4px;
   }
 
-  /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
@@ -69,7 +81,6 @@
   .bg-mist       { background-color: var(--color-mist); }
   .bg-sand       { background-color: var(--color-sand); }
 
-  /* Blush underline accent */
   .underline-blush {
     position: relative;
     display: inline-block;
