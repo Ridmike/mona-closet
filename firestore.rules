@@ -45,5 +45,14 @@ service cloud.firestore {
       // Only admins can create or edit categories
       allow write: if isAdmin();
     }
+
+    // Rules for the orders collection
+    match /orders/{orderId} {
+      // Admins can read all orders. Users can read their own orders.
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.customerId == request.auth.uid);
+      // Anyone authenticated can create an order. Only admins can update/delete.
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
   }
 }

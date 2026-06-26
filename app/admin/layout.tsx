@@ -11,7 +11,9 @@ import {
   FolderTree, 
   Users, 
   LogOut, 
-  Store 
+  Store,
+  Package,
+  ClipboardList
 } from "lucide-react";
 
 export default function AdminLayout({
@@ -36,6 +38,9 @@ export default function AdminLayout({
     { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { label: "Products", href: "/admin/products", icon: ShoppingBag },
     { label: "Categories", href: "/admin/categories", icon: FolderTree },
+    { label: "Inventory", href: "/admin/inventory", icon: Package },
+    { label: "Orders", href: "/admin/orders", icon: ClipboardList },
+    { label: "Customers", href: "/admin/customers", icon: Users },
     { label: "Staff Users", href: "/admin/users", icon: Users, roles: ["Owner", "Manager"] },
   ];
 

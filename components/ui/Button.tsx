@@ -4,23 +4,25 @@
 import { ButtonHTMLAttributes, forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
-export type ButtonSize    = "sm" | "md" | "lg";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "outline" | "danger";
+export type ButtonSize = "sm" | "md" | "lg";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
-  size?:    ButtonSize;
+  size?: ButtonSize;
   loading?: boolean;
   fullWidth?: boolean;
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-brand-mauve text-white hover:bg-brand-plum active:scale-[0.98] shadow-sm",
+    "bg-brand-mauve text-black hover:bg-brand-plum active:scale-[0.98] shadow-sm",
   secondary:
     "border border-brand-mauve text-brand-mauve bg-transparent hover:bg-brand-mist active:scale-[0.98]",
   ghost:
     "text-brand-charcoal bg-transparent hover:bg-brand-sand active:scale-[0.98]",
+  outline:
+    "border border-brand-mauve text-brand-mauve bg-transparent hover:bg-brand-mist active:scale-[0.98]  ",
   danger:
     "bg-red-600 text-white hover:bg-red-700 active:scale-[0.98]",
 };
@@ -34,9 +36,9 @@ const sizeStyles: Record<ButtonSize, string> = {
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
-      variant   = "primary",
-      size      = "md",
-      loading   = false,
+      variant = "primary",
+      size = "md",
+      loading = false,
       fullWidth = false,
       className,
       disabled,
