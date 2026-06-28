@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Button } from "@/components/ui/Button";
 import { 
@@ -16,75 +16,9 @@ import {
   ChevronRight,
   Sparkles
 } from "lucide-react";
-import type { ProductCardData } from "@/types";
-
-// Mock product data corresponding to generated images
-const MOCK_PRODUCTS: ProductCardData[] = [
-  {
-    id: "prod_1",
-    name: "Floral Pastel Midi Dress",
-    slug: "floral-pastel-midi-dress",
-    price: 4200,
-    discount: 15,
-    image: "/images/floral-midi-dress.png",
-    category: "Dresses",
-    inStock: true,
-  },
-  {
-    id: "prod_2",
-    name: "Chic Cream Linen Top",
-    slug: "chic-cream-linen-top",
-    price: 2900,
-    discount: 0,
-    image: "/images/chic-linen-top.png",
-    category: "Tops",
-    inStock: true,
-  },
-  {
-    id: "prod_3",
-    name: "Elegant Woven Straw Handbag",
-    slug: "elegant-woven-straw-handbag",
-    price: 3500,
-    discount: 10,
-    image: "/images/straw-handbag.png",
-    category: "Accessories",
-    inStock: true,
-  },
-  {
-    id: "prod_4",
-    name: "Pastel Blush Wrap Dress",
-    slug: "pastel-blush-wrap-dress",
-    price: 4800,
-    discount: 20,
-    image: "/images/pastel-wrap-dress.png",
-    category: "Dresses",
-    inStock: false, // Out of stock to test badge UI
-  },
-];
-
-const CATEGORIES = [
-  {
-    name: "Dresses",
-    count: "24 Items",
-    image: "/images/floral-midi-dress.png",
-    href: "/shop?category=dresses",
-    color: "bg-[#F8F0F3]",
-  },
-  {
-    name: "Tops & Blouses",
-    count: "18 Items",
-    image: "/images/chic-linen-top.png",
-    href: "/shop?category=tops",
-    color: "bg-[#FAF7F4]",
-  },
-  {
-    name: "Accessories",
-    count: "12 Items",
-    image: "/images/straw-handbag.png",
-    href: "/shop?category=accessories",
-    color: "bg-[#EDE6DE]",
-  },
-];
+import type { ProductCardData, Product } from "@/types";
+import { getProducts } from "@/lib/db/products";
+import { getCategories } from "@/lib/db/categories";
 
 const REVIEWS = [
   {
@@ -107,12 +41,64 @@ const REVIEWS = [
   },
 ];
 
-export default function Home() {
-  const [activeTab, setActiveTab] = useState<"all" | "dresses" | "tops" | "accessories">("all");
+// Fallback categories if Firestore is empty
+const DEFAULT_CATEGORIES = [
+  { name: "Dresses", count: "Explore", image: "/images/floral-midi-dress.png", href: "/shop?category=dresses", color: "bg-[#F8F0F3]" },
+  { name: "Tops & Blouses", count: "Explore", image: "/images/chic-linen-top.png", href: "/shop?category=tops-blouses", color: "bg-[#FAF7F4]" },
+  { name: "Accessories", count: "Explore", image: "/images/straw-handbag.png", href: "/shop?category=accessories", color: "bg-[#EDE6DE]" }
+];
 
-  const filteredProducts = activeTab === "all" 
-    ? MOCK_PRODUCTS 
-    : MOCK_PRODUCTS.filter(p => p.category.toLowerCase().includes(activeTab.substring(0, 4)));
+export default function Home() {
+  const [activeTab, setActiveTab] = useState<"all" | "dresses" | "tops & blouses" | "accessories">("all");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [prodList, catList] = await Promise.all([
+          getProducts({ limitCount: 8, publishedOnly: true }),
+          getCategories()
+        ]);
+        setProducts(prodList);
+
+        if (catList.length > 0) {
+          const list = catList.slice(0, 3).map((c, idx) => ({
+            name: c.name,
+            count: "Explore",
+            image: c.image || (idx === 0 ? "/images/floral-midi-dress.png" : idx === 1 ? "/images/chic-linen-top.png" : "/images/straw-handbag.png"),
+            href: `/shop?category=${encodeURIComponent(c.name)}`,
+            color: idx === 0 ? "bg-[#F8F0F3]" : idx === 1 ? "bg-[#FAF7F4]" : "bg-[#EDE6DE]"
+          }));
+          setCategories(list);
+        } else {
+          setCategories(DEFAULT_CATEGORIES);
+        }
+      } catch (err) {
+        console.error("Error fetching homepage data:", err);
+        setCategories(DEFAULT_CATEGORIES);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  const rawFiltered = activeTab === "all"
+    ? products
+    : products.filter(p => p.category.toLowerCase().includes(activeTab.split(" ")[0]));
+
+  const filteredProducts: ProductCardData[] = rawFiltered.map(p => ({
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    price: p.price,
+    discount: p.discount,
+    image: p.images[0] || "/images/hero.png",
+    category: p.category,
+    inStock: p.variants.some(v => v.stock > 0)
+  }));
 
   return (
     <div className="flex flex-col min-h-screen bg-brand-cream text-brand-charcoal overflow-x-hidden">
@@ -271,7 +257,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {CATEGORIES.map((category) => (
+            {categories.map((category) => (
               <Link 
                 key={category.name} 
                 href={category.href}
@@ -325,7 +311,7 @@ export default function Home() {
             
             {/* Tabs / Filters */}
             <div className="flex gap-2 mt-6 p-1 bg-brand-sand/55 rounded-full border border-brand-sand">
-              {(["all", "dresses", "tops", "accessories"] as const).map((tab) => (
+              {(["all", "dresses", "tops & blouses", "accessories"] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -335,7 +321,7 @@ export default function Home() {
                       : "text-brand-charcoal/70 hover:text-brand-charcoal"
                   }`}
                 >
-                  {tab}
+                  {tab === "tops & blouses" ? "Tops" : tab}
                 </button>
               ))}
             </div>
