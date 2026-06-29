@@ -3,9 +3,10 @@
 
 import Link              from "next/link";
 import { useState }      from "react";
-import { usePathname }   from "next/navigation";
+import { usePathname, useRouter }   from "next/navigation";
 import { cn }            from "@/lib/utils";
 import { Button }        from "@/components/ui/Button";
+import { useCartStore }  from "@/store/useCartStore";
 
 const NAV_LINKS = [
   { label: "Shop",       href: "/shop" },
@@ -14,14 +15,14 @@ const NAV_LINKS = [
   { label: "Contact",    href: "/contact" },
 ];
 
-interface NavbarProps {
-  cartCount?: number;
-}
-
-export function Navbar({ cartCount = 0 }: NavbarProps) {
+export function Navbar() {
   const pathname     = usePathname();
+  const router       = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+
+  const cartItems = useCartStore((state) => state.items);
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <>
@@ -146,6 +147,17 @@ export function Navbar({ cartCount = 0 }: NavbarProps) {
 // ── Search Overlay ────────────────────────────────────────────────────────────
 
 function SearchOverlay({ onClose }: { onClose: () => void }) {
+  const router = useRouter();
+  const [query, setQuery] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (query.trim()) {
+      router.push(`/shop?search=${encodeURIComponent(query.trim())}`);
+      onClose();
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 z-100 flex flex-col"
@@ -161,19 +173,21 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
       {/* Panel */}
       <div className="relative bg-brand-cream shadow-modal px-4 py-6 max-w-2xl mx-auto w-full mt-16 rounded-card">
         <label htmlFor="site-search" className="sr-only">Search products</label>
-        <div className="flex items-center gap-3 border-b-2 border-brand-blush pb-2">
+        <form onSubmit={handleSubmit} className="flex items-center gap-3 border-b-2 border-brand-blush pb-2">
           <SearchIcon className="text-brand-mauve shrink-0" />
           <input
             id="site-search"
             type="search"
             placeholder="Search dresses, tops, accessories…"
             autoFocus
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
             className="flex-1 bg-transparent text-brand-charcoal font-body text-base outline-none placeholder:text-brand-charcoal/40"
           />
-          <button onClick={onClose} aria-label="Close search" className="text-brand-charcoal/60 hover:text-brand-charcoal">
+          <button type="button" onClick={onClose} aria-label="Close search" className="text-brand-charcoal/60 hover:text-brand-charcoal">
             <CloseIcon />
           </button>
-        </div>
+        </form>
         <p className="mt-3 text-xs text-brand-charcoal/50 font-body">
           Press Enter to search or Esc to close
         </p>
