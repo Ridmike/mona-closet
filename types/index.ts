@@ -50,9 +50,9 @@ export interface Category {
   id:          string;
   name:        string;
   slug:        string;
-  description?: string;
-  image?:      string;
-  parent?:     string;          // parent category id
+  description?: string | null;
+  image?:      string | null;
+  parent?:     string | null;          // parent category id
   order:       number;
 }
 
@@ -93,10 +93,10 @@ export interface ShippingAddress {
   fullName:  string;
   phone:     string;
   line1:     string;
-  line2?:    string;
+  line2?:    string | null;
   city:      string;
   district:  string;
-  postalCode?: string;
+  postalCode?: string | null;
 }
 
 export interface Order {
@@ -112,7 +112,7 @@ export interface Order {
   discount:       number;
   total:          number;
   status:         OrderStatus;
-  notes?:         string;
+  notes?:         string | null;
   createdAt:      Date;
   updatedAt:      Date;
 }
