@@ -9,9 +9,11 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Plus, Edit, Trash2, X, ChevronRight, Eye } from "lucide-react";
 import { slugify } from "@/lib/utils";
+import { useToast } from "@/components/shared/Toast";
 
 export default function AdminCategoriesPage() {
   const { profile } = useAuth();
+  const { toast } = useToast();
 
   // RBAC checks
   const canModify = profile?.role === "Owner" || profile?.role === "Manager";
@@ -84,7 +86,8 @@ export default function AdminCategoriesPage() {
         await deleteCategory(id);
         setCategories(categories.filter(c => c.id !== id));
       } catch (err) {
-        alert("Error deleting category.");
+        console.error("Error deleting category:", err);
+        toast("Error deleting category. Please check permissions.", "error");
       }
     }
   };
@@ -96,9 +99,9 @@ export default function AdminCategoriesPage() {
     const categoryPayload = {
       name: formName,
       slug: formSlug,
-      description: formDescription || undefined,
-      image: formImage || undefined,
-      parent: formParent || undefined,
+      description: formDescription || null,
+      image: formImage || null,
+      parent: formParent || null,
       order: Number(formOrder)
     };
 
@@ -120,7 +123,8 @@ export default function AdminCategoriesPage() {
       }
       setShowFormModal(false);
     } catch (err) {
-      alert("Error saving category.");
+      console.error("Error saving category:", err);
+      toast("Error saving category. Please check permissions or field values.", "error");
     } finally {
       setLoading(false);
     }

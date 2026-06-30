@@ -88,10 +88,10 @@ export default function CheckoutPage() {
           fullName,
           phone,
           line1,
-          line2: line2 || undefined,
+          line2: line2 || null,
           city,
           district,
-          postalCode: postalCode || undefined
+          postalCode: postalCode || null
         },
         paymentMethod: "cod" as const,
         subtotal,
@@ -99,7 +99,7 @@ export default function CheckoutPage() {
         discount: 0,
         total,
         status: "pending" as const,
-        notes: notes || undefined
+        notes: notes || null
       };
 
       // 1. Write the order to the database

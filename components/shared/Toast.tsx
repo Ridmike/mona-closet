@@ -35,7 +35,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setToasts((prev) => [...prev, { id, type, message }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4000);
+    }, 5000);
   }, []);
 
   const dismiss = (id: string) =>
@@ -49,7 +49,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div
         aria-live="polite"
         aria-atomic="false"
-        className="fixed bottom-4 right-4 z-[200] flex flex-col gap-2 pointer-events-none"
+        className="fixed top-4 right-4 z-[200] flex flex-col gap-2 pointer-events-none"
       >
         {toasts.map((t) => (
           <ToastItem key={t.id} toast={t} onDismiss={() => dismiss(t.id)} />

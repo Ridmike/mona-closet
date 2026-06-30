@@ -11,8 +11,6 @@ import { Button } from "@/components/ui/Button";
 import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 
-const PAGE_SIZE = 12;
-
 function ShopPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -27,9 +25,10 @@ function ShopPageContent() {
   // Filter States
   const [search, setSearch] = useState(initialSearch);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const [priceRange, setPriceRange] = useState<number>(10000);
+  const [priceRange, setPriceRange] = useState<number>(50000);
   const [sortBy, setSortBy] = useState<"newest" | "price-asc" | "price-desc">("newest");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(12);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   // Sync initial params on change
@@ -86,9 +85,9 @@ function ShopPageContent() {
   });
 
   // Pagination
-  const totalPages = Math.ceil(sortedProducts.length / PAGE_SIZE);
+  const totalPages = Math.ceil(sortedProducts.length / pageSize);
   const paginatedProducts: ProductCardData[] = sortedProducts
-    .slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+    .slice((page - 1) * pageSize, page * pageSize)
     .map(p => ({
       id: p.id,
       name: p.name,
@@ -103,7 +102,7 @@ function ShopPageContent() {
   const handleClearFilters = () => {
     setSearch("");
     setSelectedCategory("");
-    setPriceRange(10000);
+    setPriceRange(50000);
     setSortBy("newest");
     setPage(1);
     router.replace("/shop");
@@ -131,18 +130,34 @@ function ShopPageContent() {
             >
               <SlidersHorizontal className="w-4 h-4" /> Filters
             </button>
-            <div className="flex items-center gap-2">
-              <label htmlFor="shop-sort" className="text-xs text-brand-charcoal/60 font-body">Sort By:</label>
-              <select
-                id="shop-sort"
-                value={sortBy}
-                onChange={(e) => { setSortBy(e.target.value as any); setPage(1); }}
-                className="px-3 py-1.5 border border-brand-sand rounded-card text-xs bg-white focus:outline-none focus:border-brand-mauve font-body"
-              >
-                <option value="newest">Newest Arrivals</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-              </select>
+             <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <label htmlFor="shop-sort" className="text-xs text-brand-charcoal/60 font-body">Sort:</label>
+                <select
+                  id="shop-sort"
+                  value={sortBy}
+                  onChange={(e) => { setSortBy(e.target.value as any); setPage(1); }}
+                  className="px-2 py-1.5 border border-brand-sand rounded-card text-[11px] bg-white focus:outline-none focus:border-brand-mauve font-body"
+                >
+                  <option value="newest">Newest</option>
+                  <option value="price-asc">Price: Low-High</option>
+                  <option value="price-desc">Price: High-Low</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <label htmlFor="shop-limit" className="text-xs text-brand-charcoal/60 font-body">Show:</label>
+                <select
+                  id="shop-limit"
+                  value={pageSize}
+                  onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
+                  className="px-2 py-1.5 border border-brand-sand rounded-card text-[11px] bg-white focus:outline-none focus:border-brand-mauve font-body"
+                >
+                  <option value="12">12 items</option>
+                  <option value="24">24 items</option>
+                  <option value="48">48 items</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -209,7 +224,7 @@ function ShopPageContent() {
                 id="price-cap"
                 type="range"
                 min="1000"
-                max="10000"
+                max="50000"
                 step="500"
                 value={priceRange}
                 onChange={(e) => { setPriceRange(Number(e.target.value)); setPage(1); }}
@@ -239,8 +254,8 @@ function ShopPageContent() {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="flex justify-between items-center p-4 border-t border-brand-sand font-body text-xs text-brand-charcoal/50">
-                    <span>Showing {(page - 1) * PAGE_SIZE + 1} to {Math.min(page * PAGE_SIZE, sortedProducts.length)} of {sortedProducts.length} items</span>
+                  <div className="flex flex-col sm:flex-row justify-between items-center p-4 border-t border-brand-sand font-body text-xs text-brand-charcoal/50 gap-4">
+                    <span>Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, sortedProducts.length)} of {sortedProducts.length} items</span>
                     <div className="flex items-center gap-1">
                       <button
                         disabled={page === 1}
@@ -332,7 +347,7 @@ function ShopPageContent() {
                 id="mobile-price"
                 type="range"
                 min="1000"
-                max="10000"
+                max="50000"
                 step="500"
                 value={priceRange}
                 onChange={(e) => { setPriceRange(Number(e.target.value)); setPage(1); }}
