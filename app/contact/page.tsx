@@ -66,39 +66,39 @@ export default function ContactPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* Contact Details Card */}
-          <div className="lg:col-span-4 bg-brand-plum text-white p-8 rounded-card shadow-lg space-y-8 flex flex-col justify-between min-h-[460px]">
+          <div className="lg:col-span-4 bg-white p-8 rounded-card border border-brand-sand/55 shadow-sm space-y-8 flex flex-col justify-between min-h-[460px]">
             <div className="space-y-6">
-              <h2 className="text-2xl font-display font-medium text-brand-blush">
+              <h2 className="text-2xl font-display font-medium text-brand-plum">
                 Contact Details
               </h2>
-              <p className="text-xs font-body text-white/70 leading-relaxed">
+              <p className="text-xs font-body text-brand-charcoal/70 leading-relaxed">
                 Prefer direct support channels? Drop us an email or reach out on our active customer WhatsApp stream.
               </p>
 
-              <div className="space-y-4 text-xs font-body text-white/80">
+              <div className="space-y-4 text-xs font-body text-brand-charcoal/80">
                 <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-brand-blush shrink-0 mt-0.5" />
+                  <MapPin className="w-5 h-5 text-brand-mauve shrink-0 mt-0.5" />
                   <div>
-                    <strong className="block text-white font-display">Coordinates</strong>
-                    <span className="mt-0.5">Colombo, Sri Lanka</span>
+                    <strong className="block text-brand-plum font-display">Coordinates</strong>
+                    <span className="mt-0.5 text-brand-charcoal">Colombo, Sri Lanka</span>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <Phone className="w-5 h-5 text-brand-blush shrink-0 mt-0.5" />
+                  <Phone className="w-5 h-5 text-brand-mauve shrink-0 mt-0.5" />
                   <div>
-                    <strong className="block text-white font-display">Customer WhatsApp</strong>
-                    <a href="https://wa.me/94XXXXXXXXX" target="_blank" rel="noopener noreferrer" className="hover:text-brand-blush transition-colors underline mt-0.5 block">
+                    <strong className="block text-brand-plum font-display">Customer WhatsApp</strong>
+                    <a href="https://wa.me/94XXXXXXXXX" target="_blank" rel="noopener noreferrer" className="hover:text-brand-mauve text-brand-plum transition-colors underline mt-0.5 block font-medium">
                       Message us on WhatsApp
                     </a>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 text-brand-blush shrink-0 mt-0.5" />
+                  <Mail className="w-5 h-5 text-brand-mauve shrink-0 mt-0.5" />
                   <div>
-                    <strong className="block text-white font-display">Email Address</strong>
-                    <a href="mailto:hello@monascloset.lk" className="hover:text-brand-blush transition-colors underline mt-0.5 block">
+                    <strong className="block text-brand-plum font-display">Email Address</strong>
+                    <a href="mailto:hello@monascloset.lk" className="hover:text-brand-mauve text-brand-plum transition-colors underline mt-0.5 block font-medium">
                       hello@monascloset.lk
                     </a>
                   </div>
@@ -106,7 +106,7 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <div className="pt-6 border-t border-white/10 text-xs text-white/45 font-body">
+            <div className="pt-6 border-t border-brand-sand/30 text-xs text-brand-charcoal/50 font-body">
               Response Time: Within 12-24 hours.
             </div>
           </div>

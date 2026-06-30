@@ -14,7 +14,8 @@ import {
   cartSubtotal, 
   computeShipping, 
   generateOrderNumber, 
-  isValidSLPhone 
+  isValidSLPhone,
+  discountedPrice
 } from "@/lib/utils";
 import { CheckCircle2, Lock, ShieldCheck, Truck, ShoppingBag, ArrowLeft } from "lucide-react";
 import Link from "next/link";

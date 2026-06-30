@@ -21,16 +21,16 @@ const INFO_LINKS = [
 
 export function Footer() {
   return (
-    <footer className="bg-brand-plum text-white/80 font-body">
+    <footer className="bg-brand-cream border-t border-brand-sand text-brand-charcoal/80 font-body">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
 
           {/* Brand */}
           <div className="lg:col-span-1">
-            <p className="font-display text-2xl text-white mb-3 tracking-wide">
+            <p className="font-display text-2xl text-brand-plum mb-3 tracking-wide font-medium">
               Mona's Closet
             </p>
-            <p className="text-sm leading-relaxed text-white/60 max-w-xs">
+            <p className="text-sm leading-relaxed text-brand-charcoal/70 max-w-xs">
               Trendy women's fashion delivered to your door across Sri Lanka.
               Discover styles that feel as good as they look.
             </p>
@@ -42,7 +42,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Mona's Closet on Facebook"
-                className="p-2 rounded-full bg-white/10 hover:bg-brand-mauve transition-colors"
+                className="p-2 rounded-full bg-brand-sand hover:bg-brand-plum hover:text-white text-brand-charcoal/80 transition-colors"
               >
                 <FacebookIcon />
               </a>
@@ -51,7 +51,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Mona's Closet on TikTok"
-                className="p-2 rounded-full bg-white/10 hover:bg-brand-mauve transition-colors"
+                className="p-2 rounded-full bg-brand-sand hover:bg-brand-plum hover:text-white text-brand-charcoal/80 transition-colors"
               >
                 <TikTokIcon />
               </a>
@@ -60,7 +60,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Mona's Closet on Instagram"
-                className="p-2 rounded-full bg-white/10 hover:bg-brand-mauve transition-colors"
+                className="p-2 rounded-full bg-brand-sand hover:bg-brand-plum hover:text-white text-brand-charcoal/80 transition-colors"
               >
                 <InstagramIcon />
               </a>
@@ -69,7 +69,7 @@ export function Footer() {
 
           {/* Shop */}
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-widest text-white mb-4">
+            <h3 className="text-sm font-semibold uppercase tracking-widest text-brand-plum mb-4 font-display">
               Shop
             </h3>
             <ul className="space-y-2.5">
@@ -77,7 +77,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-white/60 hover:text-white transition-colors"
+                    className="text-sm text-brand-charcoal/70 hover:text-brand-plum transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -88,7 +88,7 @@ export function Footer() {
 
           {/* Info */}
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-widest text-white mb-4">
+            <h3 className="text-sm font-semibold uppercase tracking-widest text-brand-plum mb-4 font-display">
               Information
             </h3>
             <ul className="space-y-2.5">
@@ -96,7 +96,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-white/60 hover:text-white transition-colors"
+                    className="text-sm text-brand-charcoal/70 hover:text-brand-plum transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -107,42 +107,42 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-widest text-white mb-4">
+            <h3 className="text-sm font-semibold uppercase tracking-widest text-brand-plum mb-4 font-display">
               Get in Touch
             </h3>
-            <ul className="space-y-3 text-sm text-white/60">
+            <ul className="space-y-3 text-sm text-brand-charcoal/75">
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 shrink-0">📍</span>
                 <span>Colombo, Sri Lanka</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 shrink-0">💬</span>
-                <a href="https://wa.me/94XXXXXXXXX" className="hover:text-white transition-colors">
+                <a href="https://wa.me/94XXXXXXXXX" className="hover:text-brand-plum text-brand-charcoal/80 transition-colors underline font-medium">
                   WhatsApp us
                 </a>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 shrink-0">✉️</span>
-                <a href="mailto:hello@monascloset.lk" className="hover:text-white transition-colors">
+                <a href="mailto:hello@monascloset.lk" className="hover:text-brand-plum text-brand-charcoal/80 transition-colors underline font-medium">
                   hello@monascloset.lk
                 </a>
               </li>
             </ul>
 
             {/* COD badge */}
-            <div className="mt-5 inline-flex items-center gap-2 bg-white/10 rounded-card px-3 py-2">
-              <span className="text-brand-blush text-base">💳</span>
-              <span className="text-xs text-white/80">Cash on Delivery available</span>
+            <div className="mt-5 inline-flex items-center gap-2 bg-brand-sand/40 border border-brand-sand/70 rounded-card px-3 py-2">
+              <span className="text-base">💳</span>
+              <span className="text-xs text-brand-charcoal/80 font-medium">Cash on Delivery available</span>
             </div>
           </div>
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/40">
+        <div className="mt-12 pt-6 border-t border-brand-sand flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-brand-charcoal/40">
           <p>© {new Date().getFullYear()} Mona's Closet. All rights reserved.</p>
           <div className="flex gap-4">
-            <Link href="/privacy" className="hover:text-white/70 transition-colors">Privacy</Link>
-            <Link href="/terms"   className="hover:text-white/70 transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-brand-plum transition-colors font-medium">Privacy</Link>
+            <Link href="/terms"   className="hover:text-brand-plum transition-colors font-medium">Terms</Link>
           </div>
         </div>
       </div>

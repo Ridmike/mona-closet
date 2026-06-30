@@ -4,16 +4,16 @@
 /* ── Design Tokens ───────────────────────────────────────────── */
 :root {
   --font-cormorant: "Cormorant", Georgia, serif;
-  --font-inter:     "Inter", system-ui, sans-serif;
+  --font-inter: "Inter", system-ui, sans-serif;
 
   /* Palette */
-  --color-blush:    #F2C4CE;
-  --color-mauve:    #C5768A;
-  --color-plum:     #7D3550;
-  --color-cream:    #FAF7F4;
-  --color-sand:     #EDE6DE;
+  --color-blush: #F2C4CE;
+  --color-mauve: #C5768A;
+  --color-plum: #7D3550;
+  --color-cream: #FAF7F4;
+  --color-sand: #EDE6DE;
   --color-charcoal: #2C2024;
-  --color-mist:     #F8F0F3;
+  --color-mist: #F8F0F3;
 
   /* Spacing rhythm */
   --section-py: 5rem;
@@ -22,11 +22,28 @@
   --ease-brand: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@theme inline {
+@theme {
   --font-sans: var(--font-inter);
   --font-serif: var(--font-cormorant);
   --color-background: var(--color-cream);
   --color-foreground: var(--color-charcoal);
+
+  --color-brand-blush: #F2C4CE;
+  --color-brand-mauve: #C5768A;
+  --color-brand-plum: #7D3550;
+  --color-brand-cream: #FAF7F4;
+  --color-brand-sand: #EDE6DE;
+  --color-brand-charcoal: #2C2024;
+  --color-brand-mist: #F8F0F3;
+
+  --color-blush: #F2C4CE;
+  --color-mauve: #C5768A;
+  --color-plum: #7D3550;
+  --color-cream: #FAF7F4;
+  --color-sand: #EDE6DE;
+  --color-charcoal: #2C2024;
+  --color-mist: #F8F0F3;
+
   --text-display-xl: 3.75rem;
   --text-display-xl--line-height: 1.1;
   --text-display-lg: 3rem;
@@ -43,20 +60,33 @@
 
   body {
     background-color: var(--color-cream);
-    color:            var(--color-charcoal);
-    font-family:      var(--font-inter);
+    color: var(--color-charcoal);
+    font-family: var(--font-inter);
     @apply antialiased text-base leading-relaxed;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-cormorant);
-    color:       var(--color-plum);
+    color: var(--color-plum);
     @apply font-medium leading-tight;
   }
 
-  h1 { @apply text-display-xl; }
-  h2 { @apply text-display-lg; }
-  h3 { @apply text-display-md; }
+  h1 {
+    @apply text-display-xl;
+  }
+
+  h2 {
+    @apply text-display-lg;
+  }
+
+  h3 {
+    @apply text-display-md;
+  }
 
   :focus-visible {
     outline: 2px solid var(--color-mauve);
@@ -65,7 +95,10 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+
+    *,
+    *::before,
+    *::after {
       animation-duration: 0.01ms !important;
       transition-duration: 0.01ms !important;
     }
@@ -74,22 +107,43 @@
 
 /* ── Utility Layer ───────────────────────────────────────────── */
 @layer utilities {
-  .section-py    { padding-top: var(--section-py); padding-bottom: var(--section-py); }
-  .text-balance  { text-wrap: balance; }
-  .text-plum     { color: var(--color-plum); }
-  .bg-cream      { background-color: var(--color-cream); }
-  .bg-mist       { background-color: var(--color-mist); }
-  .bg-sand       { background-color: var(--color-sand); }
+  .section-py {
+    padding-top: var(--section-py);
+    padding-bottom: var(--section-py);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-plum {
+    color: var(--color-plum);
+  }
+
+  .bg-cream {
+    background-color: var(--color-cream);
+  }
+
+  .bg-mist {
+    background-color: var(--color-mist);
+  }
+
+  .bg-sand {
+    background-color: var(--color-sand);
+  }
 
   .underline-blush {
     position: relative;
     display: inline-block;
   }
+
   .underline-blush::after {
     content: "";
     position: absolute;
-    left: 0; bottom: -4px;
-    width: 100%; height: 3px;
+    left: 0;
+    bottom: -4px;
+    width: 100%;
+    height: 3px;
     background: var(--color-blush);
     border-radius: 2px;
   }
