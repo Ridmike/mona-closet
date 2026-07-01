@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper to check if the request is from an authenticated user
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper to check if the user is accessing their own document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Helper to check if the authenticated user has administrative privileges
+    function isAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'Owner' ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'Manager' ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'Staff');
+    }
+
+    // Rules for the users collection
+    match /users/{userId} {
+      // Users can always read and write their own profile document.
+      // This must NOT go through isAdmin() to avoid a circular get() deadlock.
+      allow read: if isOwner(userId) || isAdmin();
+      // Allow a user to create their own profile document (e.g. on first sign-in)
+      // and to update it. Admins can also write any profile.
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    // Rules for the products collection
+    match /products/{productId} {
+      // Anyone (including guest users) can browse products
+      allow read: if true;
+      // Only authenticated users with administrative roles can add, edit, or delete products
+      allow write: if isAdmin();
+    }
+
+    // Rules for the categories collection
+    match /categories/{categoryId} {
+      // Anyone can browse categories
+      allow read: if true;
+      // Only admins can create or edit categories
+      allow write: if isAdmin();
+    }
+
+    // Rules for the orders collection
+    match /orders/{orderId} {
+      // Admins can read all orders. Users can read their own orders.
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.customerId == request.auth.uid);
+      // Anyone authenticated can create an order. Only admins can update/delete.
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+  }
+}
