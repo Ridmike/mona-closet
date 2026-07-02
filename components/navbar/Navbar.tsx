@@ -6,7 +6,8 @@ import { useState }      from "react";
 import { usePathname, useRouter }   from "next/navigation";
 import { cn }            from "@/lib/utils";
 import { Button }        from "@/components/ui/Button";
-import { useCartStore }  from "@/store/useCartStore";
+import { useCartStore }     from "@/store/useCartStore";
+import { useWishlistStore } from "@/store/useWishlistStore";
 
 const NAV_LINKS = [
   { label: "Shop",       href: "/shop" },
@@ -21,8 +22,10 @@ export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
-  const cartItems = useCartStore((state) => state.items);
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const cartItems    = useCartStore((state) => state.items);
+  const cartCount    = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const wishlistIds  = useWishlistStore(state => state.productIds);
+  const wishlistCount = wishlistIds.length;
 
   return (
     <>
@@ -65,6 +68,20 @@ export function Navbar() {
               >
                 <SearchIcon />
               </button>
+
+              {/* Wishlist */}
+              <Link
+                href="/wishlist"
+                aria-label={`Wishlist – ${wishlistCount} items`}
+                className="relative hidden sm:flex p-2 text-brand-charcoal hover:text-brand-mauve transition-colors rounded-full hover:bg-brand-mist"
+              >
+                <HeartIcon filled={wishlistCount > 0} />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-4.5 h-4.5 flex items-center justify-center bg-brand-mauve text-white text-[10px] font-bold rounded-full px-1">
+                    {wishlistCount > 99 ? "99+" : wishlistCount}
+                  </span>
+                )}
+              </Link>
 
               {/* Account */}
               <Link
@@ -125,6 +142,18 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              href="/wishlist"
+              onClick={() => setMenuOpen(false)}
+              className="px-3 py-2.5 rounded-card text-sm font-body font-medium text-brand-charcoal hover:bg-brand-mist hover:text-brand-mauve transition-colors flex items-center justify-between"
+            >
+              <span>Wishlist</span>
+              {wishlistCount > 0 && (
+                <span className="bg-brand-mauve text-white text-[10px] font-bold rounded-full px-2 py-0.5">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
             <Link
               href="/account"
               onClick={() => setMenuOpen(false)}
@@ -212,6 +241,14 @@ function UserIcon() {
     <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
       <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+}
+
+function HeartIcon({ filled }: { filled?: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" className="w-5 h-5" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </svg>
   );
 }
