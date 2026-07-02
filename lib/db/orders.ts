@@ -10,6 +10,7 @@ import {
   getDocs, 
   query, 
   orderBy,
+  where,
   DocumentData
 } from "firebase/firestore";
 import type { Order } from "@/types";
@@ -81,4 +82,33 @@ export async function getOrders(): Promise<Order[]> {
   const q = query(ordersRef, orderBy("createdAt", "desc"));
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs.map(doc => docToOrder(doc.data(), doc.id));
+}
+
+// Fetches only orders for a specific customer UID (safe for non-admin users).
+// Also queries by email to catch orders placed during guest checkout where
+// the customerId may differ from the current Firebase Auth UID.
+// NOTE: No orderBy() here to avoid requiring a Firestore composite index.
+//       Sorting is done client-side since a customer's order count is small.
+export async function getOrdersByCustomer(customerId: string, email?: string): Promise<Order[]> {
+  const ordersRef = collection(db, COLLECTION_NAME);
+
+  // Query 1: by customerId (for authenticated checkout orders)
+  const q1 = query(ordersRef, where("customerId", "==", customerId));
+  const snap1 = await getDocs(q1);
+  const orderMap = new Map<string, Order>();
+  snap1.docs.forEach(d => orderMap.set(d.id, docToOrder(d.data(), d.id)));
+
+  // Query 2: by customerEmail (for guest / legacy orders with different customerId)
+  if (email) {
+    const q2 = query(ordersRef, where("customerEmail", "==", email.toLowerCase()));
+    const snap2 = await getDocs(q2);
+    snap2.docs.forEach(d => {
+      if (!orderMap.has(d.id)) orderMap.set(d.id, docToOrder(d.data(), d.id));
+    });
+  }
+
+  // Sort merged results newest first (client-side)
+  return Array.from(orderMap.values()).sort(
+    (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+  );
 }
