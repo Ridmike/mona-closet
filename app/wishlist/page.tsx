@@ -54,7 +54,6 @@ export default function WishlistPage() {
       size:        firstVariant.size,
       color:       firstVariant.color,
       quantity:    1,
-      sku:         firstVariant.sku,
     });
     toast.success(`${product.name} added to cart!`);
   };

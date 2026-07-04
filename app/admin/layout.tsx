@@ -5,6 +5,7 @@ import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { 
   LayoutDashboard, 
   ShoppingBag, 
@@ -13,8 +14,10 @@ import {
   LogOut, 
   Store,
   Package,
-  ClipboardList
+  ClipboardList,
+  MessageSquare
 } from "lucide-react";
+import { getContactMessages } from "@/lib/db/content";
 
 export default function AdminLayout({
   children,
@@ -24,6 +27,13 @@ export default function AdminLayout({
   const { profile, logout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+  const [unreadMessages, setUnreadMessages] = useState(0);
+
+  useEffect(() => {
+    getContactMessages()
+      .then(msgs => setUnreadMessages(msgs.filter(m => !m.read).length))
+      .catch(() => {});
+  }, [pathname]);
 
   if (pathname === "/admin/login") {
     return <>{children}</>;
@@ -35,13 +45,14 @@ export default function AdminLayout({
   };
 
   const navItems = [
-    { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-    { label: "Products", href: "/admin/products", icon: ShoppingBag },
-    { label: "Categories", href: "/admin/categories", icon: FolderTree },
+    { label: "Dashboard", href: "/admin",           icon: LayoutDashboard },
+    { label: "Products",  href: "/admin/products",  icon: ShoppingBag },
+    { label: "Categories",href: "/admin/categories",icon: FolderTree },
     { label: "Inventory", href: "/admin/inventory", icon: Package },
-    { label: "Orders", href: "/admin/orders", icon: ClipboardList },
+    { label: "Orders",    href: "/admin/orders",    icon: ClipboardList },
     { label: "Customers", href: "/admin/customers", icon: Users },
-    { label: "Staff Users", href: "/admin/users", icon: Users, roles: ["Owner", "Manager"] },
+    { label: "Messages",  href: "/admin/messages",  icon: MessageSquare, badge: unreadMessages },
+    { label: "Staff Users",href: "/admin/users",   icon: Users, roles: ["Owner", "Manager"] },
   ];
 
   return (
@@ -93,7 +104,12 @@ export default function AdminLayout({
                     }`}
                   >
                     <Icon className="w-4 h-4 shrink-0" />
-                    {item.label}
+                    <span className="flex-1">{item.label}</span>
+                    {"badge" in item && (item.badge as number) > 0 && (
+                      <span className="bg-brand-mauve text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                        {(item.badge as number) > 99 ? "99+" : item.badge}
+                      </span>
+                    )}
                   </Link>
                 );
               })}

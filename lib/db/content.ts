@@ -7,6 +7,8 @@ import {
   getDocs, 
   setDoc, 
   addDoc,
+  updateDoc,
+  deleteDoc,
   query, 
   orderBy,
   DocumentData
@@ -26,10 +28,12 @@ export interface FAQItem {
 }
 
 export interface ContactMessage {
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
+  id:        string;
+  name:      string;
+  email:     string;
+  subject:   string;
+  message:   string;
+  read:      boolean;
   createdAt: Date;
 }
 
@@ -93,12 +97,55 @@ export async function getFAQs(): Promise<FAQItem[]> {
  * Submit contact inquiry to Firestore.
  */
 export async function submitContactMessage(
-  payload: Omit<ContactMessage, "createdAt">
+  payload: Omit<ContactMessage, "id" | "createdAt" | "read">
 ): Promise<string> {
   const colRef = collection(db, "contact_messages");
   const docRef = await addDoc(colRef, {
     ...payload,
+    read: false,
     createdAt: new Date()
   });
   return docRef.id;
+}
+
+/**
+ * Fetch all contact messages for admin view (ordered newest first).
+ */
+export async function getContactMessages(): Promise<ContactMessage[]> {
+  try {
+    const colRef = collection(db, "contact_messages");
+    const q = query(colRef, orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => {
+      const data = d.data() as DocumentData;
+      return {
+        id:        d.id,
+        name:      data.name      || "",
+        email:     data.email     || "",
+        subject:   data.subject   || "",
+        message:   data.message   || "",
+        read:      data.read      ?? false,
+        createdAt: data.createdAt?.toDate() || new Date(),
+      };
+    });
+  } catch (err) {
+    console.error("Error loading contact messages:", err);
+    return [];
+  }
+}
+
+/**
+ * Mark a contact message as read or unread.
+ */
+export async function markMessageRead(id: string, read: boolean): Promise<void> {
+  const docRef = doc(db, "contact_messages", id);
+  await updateDoc(docRef, { read });
+}
+
+/**
+ * Delete a contact message.
+ */
+export async function deleteContactMessage(id: string): Promise<void> {
+  const docRef = doc(db, "contact_messages", id);
+  await deleteDoc(docRef);
 }
