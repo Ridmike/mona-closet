@@ -7,7 +7,7 @@ import { getCategories, createCategory, updateCategory, deleteCategory } from "@
 import type { Category } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Plus, Edit, Trash2, X, ChevronRight, Eye } from "lucide-react";
+import { Plus, Edit, Trash2, X, ChevronRight, Eye, Upload } from "lucide-react";
 import { slugify } from "@/lib/utils";
 import { useToast } from "@/components/shared/Toast";
 
@@ -271,13 +271,61 @@ export default function AdminCategoriesPage() {
                   </select>
                 </div>
               </div>
-              <Input
-                label="Image URL"
-                disabled={!canModify}
-                value={formImage}
-                onChange={(e) => setFormImage(e.target.value)}
-                placeholder="e.g. /images/linen-dress-cat.png"
-              />
+              <div className="flex flex-col gap-1.5 text-zinc-700">
+                <label className="text-xs font-semibold font-body">Category Image</label>
+                <div className="flex items-center gap-3">
+                  {formImage && (
+                    <div className="relative w-16 h-16 rounded-card overflow-hidden border border-brand-sand shrink-0 bg-brand-cream flex items-center justify-center">
+                      <img src={formImage} alt="Preview" className="object-cover w-full h-full" />
+                      <button
+                        type="button"
+                        onClick={() => setFormImage("")}
+                        className="absolute inset-0 bg-black/50 text-white opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center text-xs font-semibold"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={!canModify}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+
+                        const formData = new FormData();
+                        formData.append("file", file);
+
+                        try {
+                          toast("Uploading image to Cloudinary...", "info");
+                          const res = await fetch("/api/upload", {
+                            method: "POST",
+                            body: formData
+                          });
+                          const data = await res.json();
+                          if (data.error) throw new Error(data.error);
+                          setFormImage(data.url);
+                          toast("Image uploaded successfully!", "success");
+                        } catch (err: any) {
+                          toast(err.message || "Failed to upload image", "error");
+                        }
+                      }}
+                      className="hidden"
+                      id="category-image-upload"
+                    />
+                    <label
+                      htmlFor="category-image-upload"
+                      className={`flex items-center justify-center px-4 py-2.5 border border-dashed border-zinc-300 rounded-card text-xs font-semibold hover:border-brand-mauve cursor-pointer transition-colors bg-white text-zinc-600 gap-1.5 ${!canModify ? "opacity-50 pointer-events-none" : ""
+                        }`}
+                    >
+                      <Upload className="w-4 h-4 text-zinc-400" />
+                      {formImage ? "Change Image" : "Upload Image to Cloudinary"}
+                    </label>
+                  </div>
+                </div>
+              </div>
               <div className="flex flex-col gap-1.5 text-zinc-700">
                 <label className="text-xs font-semibold font-body">Description</label>
                 <textarea

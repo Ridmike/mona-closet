@@ -18,9 +18,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
-  Eye
+  Eye,
+  Upload
 } from "lucide-react";
 import { formatPrice, slugify } from "@/lib/utils";
+import { useToast } from "@/components/shared/Toast";
 
 const PAGE_SIZE = 10;
 
@@ -28,6 +30,7 @@ const SIZES: ProductSize[] = ["XS", "S", "M", "L", "XL", "XXL", "Free Size"];
 
 export default function AdminProductsPage() {
   const { profile } = useAuth();
+  const { toast } = useToast();
 
   // RBAC checks
   const canModify = profile?.role === "Owner" || profile?.role === "Manager";
@@ -60,6 +63,19 @@ export default function AdminProductsPage() {
   const [formPublished, setFormPublished] = useState(true);
   const [formImagesText, setFormImagesText] = useState(""); // comma separated URLs
   const [formVariants, setFormVariants] = useState<ProductVariant[]>([]);
+
+  // Split images helper
+  const getImagesList = () => {
+    return formImagesText
+      .split(",")
+      .map(url => url.trim())
+      .filter(url => url.length > 0);
+  };
+  
+  // Set images helper
+  const setImagesList = (list: string[]) => {
+    setFormImagesText(list.join(", "));
+  };
 
   // Variant Builder Fields
   const [varSize, setVarSize] = useState<ProductSize>("M");
@@ -490,15 +506,74 @@ export default function AdminProductsPage() {
               </div>
 
               <div className="flex flex-col gap-1.5 text-zinc-700">
-                <label className="text-xs font-semibold font-body">Images (Comma-separated URLs)</label>
-                <textarea
-                  rows={2}
-                  disabled={!canModify}
-                  value={formImagesText}
-                  onChange={(e) => setFormImagesText(e.target.value)}
-                  placeholder="e.g. /images/top.png, /images/top-back.png"
-                  className="w-full px-3 py-2 border border-brand-sand rounded-card text-sm focus:outline-none focus:border-brand-mauve font-body"
-                />
+                <label className="text-xs font-semibold font-body">Product Images</label>
+                
+                {/* Thumbnails list */}
+                <div className="flex flex-wrap gap-3 mb-2">
+                  {getImagesList().map((imgUrl, idx) => (
+                    <div key={idx} className="relative w-20 h-20 rounded-card overflow-hidden border border-brand-sand bg-brand-cream group flex items-center justify-center shrink-0">
+                      <img src={imgUrl} alt={`Product ${idx + 1}`} className="object-cover w-full h-full" />
+                      {canModify && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const currentList = getImagesList();
+                            const newList = currentList.filter((_, i) => i !== idx);
+                            setImagesList(newList);
+                          }}
+                          className="absolute inset-0 bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-xs font-semibold"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  
+                  {canModify && (
+                    <div className="w-20 h-20 shrink-0">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={async (e) => {
+                          const files = Array.from(e.target.files || []);
+                          if (files.length === 0) return;
+                          
+                          toast(`Uploading ${files.length} image(s)...`, "info");
+                          
+                          try {
+                            const uploadedUrls: string[] = [];
+                            for (const file of files) {
+                              const formData = new FormData();
+                              formData.append("file", file);
+                              const res = await fetch("/api/upload", {
+                                method: "POST",
+                                body: formData
+                              });
+                              const data = await res.json();
+                              if (data.error) throw new Error(data.error);
+                              uploadedUrls.push(data.url);
+                            }
+                            const newList = [...getImagesList(), ...uploadedUrls];
+                            setImagesList(newList);
+                            toast("Images uploaded successfully!", "success");
+                          } catch (err: any) {
+                            toast(err.message || "Failed to upload image(s)", "error");
+                          }
+                        }}
+                        className="hidden"
+                        id="product-images-upload"
+                      />
+                      <label
+                        htmlFor="product-images-upload"
+                        className="w-full h-full flex flex-col items-center justify-center border border-dashed border-zinc-300 hover:border-brand-mauve rounded-card cursor-pointer transition-colors bg-white hover:bg-zinc-50"
+                      >
+                        <Upload className="w-5 h-5 text-zinc-400" />
+                        <span className="text-[10px] text-zinc-500 font-semibold mt-1 font-body">Add Image</span>
+                      </label>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="flex gap-6 items-center">
