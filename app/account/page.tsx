@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { getOrders } from "@/lib/db/orders";
+import { getOrdersByCustomer } from "@/lib/db/orders";
 import type { Order } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -57,9 +57,7 @@ function AccountDashboard() {
       if (!user) return;
       try {
         setLoadingOrders(true);
-        const allOrders = await getOrders();
-        // Filter orders placed by this customer UID
-        const userOrders = allOrders.filter(o => o.customerId === user.uid);
+        const userOrders = await getOrdersByCustomer(user.uid, user.email ?? undefined);
         setOrders(userOrders);
       } catch (err) {
         console.error("Error loading user orders:", err);

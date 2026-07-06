@@ -20,15 +20,19 @@ import {
 import { CheckCircle2, Lock, ShieldCheck, Truck, ShoppingBag, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { db, auth } from "@/lib/firebase";
+import { collection, doc, setDoc, getDocs, query, where } from "firebase/firestore";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 export default function CheckoutPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const cartItems = useCartStore(state => state.items);
   const clearCart = useCartStore(state => state.clearCart);
   const router = useRouter();
 
   // Shipping form fields
   const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [line1, setLine1] = useState("");
   const [line2, setLine2] = useState("");
@@ -36,16 +40,21 @@ export default function CheckoutPage() {
   const [district, setDistrict] = useState("Colombo");
   const [postalCode, setPostalCode] = useState("");
   const [notes, setNotes] = useState("");
+  const [password, setPassword] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState<string | null>(null); // success order number
 
+  // Sync profile details if logged in
   useEffect(() => {
-    if (!authLoading && !user) {
-      toast.error("Please sign in to place an order.");
-      router.push("/login?redirect=/checkout");
+    if (profile) {
+      if (profile.displayName) setFullName(profile.displayName);
+      if (profile.email) setEmail(profile.email);
+      if (profile.phone) setPhone(profile.phone);
+    } else if (user && user.email) {
+      setEmail(user.email);
     }
-  }, [user, authLoading, router]);
+  }, [profile, user]);
 
   if (authLoading) {
     return (
@@ -55,8 +64,6 @@ export default function CheckoutPage() {
       </div>
     );
   }
-
-  if (!user) return null;
 
   const subtotal = cartSubtotal(cartItems);
   const shippingFee = computeShipping(subtotal);
@@ -70,6 +77,16 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (!email || !email.includes("@")) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    if (!user && (!password || password.length < 6)) {
+      toast.error("Please enter a password of at least 6 characters to create your account.");
+      return;
+    }
+
     if (!isValidSLPhone(phone)) {
       toast.error("Please enter a valid Sri Lankan mobile number (e.g. 0771234567).");
       return;
@@ -78,11 +95,56 @@ export default function CheckoutPage() {
     try {
       setLoading(true);
       const orderNumber = generateOrderNumber();
+      let finalCustomerId = "";
+
+      if (user) {
+        // Logged-in user
+        finalCustomerId = user.uid;
+        // Keep profile in sync
+        const userDocRef = doc(db, "users", user.uid);
+        await setDoc(userDocRef, {
+          uid: user.uid,
+          email: user.email || email.trim().toLowerCase(),
+          displayName: profile?.displayName || fullName,
+          phone: profile?.phone || phone,
+          role: profile?.role || "Customer",
+          createdAt: profile?.createdAt || new Date()
+        }, { merge: true });
+      } else {
+        // Guest checkout - authenticate them by creating a Firebase Auth user
+        try {
+          const userCredential = await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
+          finalCustomerId = userCredential.user.uid;
+
+          // Create a new Customer account document in Firestore using their auth UID
+          const userDocRef = doc(db, "users", finalCustomerId);
+          await setDoc(userDocRef, {
+            uid: finalCustomerId,
+            email: email.trim().toLowerCase(),
+            displayName: fullName,
+            phone: phone,
+            role: "Customer",
+            createdAt: new Date()
+          });
+        } catch (authErr: any) {
+          if (authErr.code === "auth/email-already-in-use") {
+            toast.error("This email is already registered. Please sign in to place your order.");
+            setLoading(false);
+            return;
+          } else if (authErr.code === "auth/weak-password") {
+            toast.error("Password is too weak. Please use a stronger password.");
+            setLoading(false);
+            return;
+          } else {
+            throw authErr;
+          }
+        }
+      }
 
       const orderPayload = {
         orderNumber,
-        customerId: user.uid,
-        customerEmail: user.email || "",
+        customerId: finalCustomerId,
+        customerEmail: email.trim().toLowerCase(),
         items: cartItems,
         shippingAddress: {
           fullName,
@@ -105,21 +167,23 @@ export default function CheckoutPage() {
       // 1. Write the order to the database
       await createOrder(orderPayload);
 
-      // 2. Decrement inventory stock levels
-      for (const item of cartItems) {
-        const product = await getProduct(item.productId);
-        if (product) {
-          const updatedVariants = product.variants.map(v => {
-            if (v.id === item.variantId) {
-              return {
-                ...v,
-                stock: Math.max(0, v.stock - item.quantity)
-              };
-            }
-            return v;
-          });
-          await updateProduct(product.id, { variants: updatedVariants });
+      // 2. Decrement inventory stock levels (non-critical — order already saved)
+      try {
+        for (const item of cartItems) {
+          const product = await getProduct(item.productId);
+          if (product) {
+            const updatedVariants = product.variants.map(v => {
+              if (v.id === item.variantId) {
+                return { ...v, stock: Math.max(0, v.stock - item.quantity) };
+              }
+              return v;
+            });
+            await updateProduct(product.id, { variants: updatedVariants });
+          }
         }
+      } catch (stockErr) {
+        // Stock update is best-effort; don't block the customer success screen
+        console.warn("Stock update failed (non-blocking):", stockErr);
       }
 
       // 3. Clear shopping cart
@@ -224,7 +288,25 @@ export default function CheckoutPage() {
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="e.g. Dilini Rajapaksa"
                 />
-
+                <Input
+                  label="Email Address"
+                  type="email"
+                  required
+                  disabled={!!user}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="e.g. dilini@example.com"
+                />
+                {!user && (
+                  <Input
+                    label="Create Account Password"
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="At least 6 characters"
+                  />
+                )}
                 <Input
                   label="Phone Number (Sri Lankan mobile, e.g. 0771234567)"
                   required

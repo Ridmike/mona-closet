@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { cn, formatPrice, discountedPrice } from "@/lib/utils";
 import type { ProductCardData } from "@/types";
+import { useWishlistStore } from "@/store/useWishlistStore";
 
 interface ProductCardProps {
   product:   ProductCardData;
@@ -14,8 +15,11 @@ interface ProductCardProps {
 
 export function ProductCard({ product, className }: ProductCardProps) {
   const [hovered, setHovered]       = useState(false);
-  const [wishlist, setWishlist]     = useState(false);
   const [imgLoaded, setImgLoaded]   = useState(false);
+
+  const wishlistIds    = useWishlistStore(state => state.productIds);
+  const toggleWishlist = useWishlistStore(state => state.toggleWishlist);
+  const isWishlisted   = wishlistIds.includes(product.id);
 
   const finalPrice   = discountedPrice(product.price, product.discount);
   const hasDiscount  = !!product.discount && product.discount > 0;
@@ -73,21 +77,22 @@ export function ProductCard({ product, className }: ProductCardProps) {
         <button
           onClick={(e) => {
             e.preventDefault();
-            setWishlist((w) => !w);
+            toggleWishlist(product.id);
           }}
-          aria-label={wishlist ? "Remove from wishlist" : "Add to wishlist"}
+          aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
           className={cn(
             "absolute top-2.5 right-2.5 p-2 rounded-full bg-white/90 backdrop-blur-sm",
-            "transition-all duration-200",
-            hovered ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1",
-            "hover:bg-white shadow-sm"
+            "transition-all duration-200 shadow-sm hover:bg-white",
+            isWishlisted
+              ? "opacity-100 translate-y-0"
+              : hovered ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1"
           )}
         >
           <svg
             viewBox="0 0 24 24"
             className={cn(
               "w-4 h-4 transition-colors duration-200",
-              wishlist ? "fill-brand-mauve text-brand-mauve" : "fill-none text-brand-charcoal"
+              isWishlisted ? "fill-brand-mauve text-brand-mauve" : "fill-none text-brand-charcoal"
             )}
             stroke="currentColor" strokeWidth="2"
           >

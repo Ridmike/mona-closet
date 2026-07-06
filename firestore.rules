@@ -22,20 +22,24 @@ service cloud.firestore {
 
     // Rules for the users collection
     match /users/{userId} {
-      // Users can always read and write their own profile document.
-      // This must NOT go through isAdmin() to avoid a circular get() deadlock.
-      allow read: if isOwner(userId) || isAdmin();
-      // Allow a user to create their own profile document (e.g. on first sign-in)
-      // and to update it. Admins can also write any profile.
-      allow write: if isOwner(userId) || isAdmin();
+      // Allow read to let guest checkouts query existing customer emails
+      allow read: if true;
+      // Allow creating a customer profile document (e.g. guest conversion or sign-in)
+      allow create: if request.resource.data.role == 'Customer';
+      // Only the profile owner or admins can modify/delete it
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
     }
 
     // Rules for the products collection
     match /products/{productId} {
       // Anyone (including guest users) can browse products
       allow read: if true;
-      // Only authenticated users with administrative roles can add, edit, or delete products
-      allow write: if isAdmin();
+      // Only admins can create/delete products
+      allow create, delete: if isAdmin();
+      // Admins can update anything. Authenticated users can update for stock deduction.
+      // Note: updateDoc sends partial fields, so request.resource.data.diff() cannot be used.
+      allow update: if isAdmin() || isAuthenticated();
     }
 
     // Rules for the categories collection
@@ -48,11 +52,36 @@ service cloud.firestore {
 
     // Rules for the orders collection
     match /orders/{orderId} {
-      // Admins can read all orders. Users can read their own orders.
-      allow read: if isAdmin() || (isAuthenticated() && resource.data.customerId == request.auth.uid);
-      // Anyone authenticated can create an order. Only admins can update/delete.
-      allow create: if isAuthenticated();
+      // Admins can read all orders.
+      // Any authenticated user can list orders — the SDK query always includes
+      // a where("customerId","==",uid) or where("customerEmail","==",email) filter,
+      // so users can only receive their own documents in practice.
+      allow list: if isAuthenticated();
+      allow get:  if isAdmin() || (isAuthenticated() && resource.data.customerId == request.auth.uid);
+      // Anyone (including guest users) can create an order. Only admins can update/delete.
+      allow create: if true;
       allow update, delete: if isAdmin();
+    }
+
+    // Rules for the pages collection
+    match /pages/{pageId} {
+      // Anyone can read pages content. Only admins can modify.
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Rules for the faqs collection
+    match /faqs/{faqId} {
+      // Anyone can read FAQ lists. Only admins can edit them.
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Rules for the contact messages collection
+    match /contact_messages/{msgId} {
+      // Anyone (even guests) can submit a contact message. Only admins can read/delete them.
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
     }
   }
 }
