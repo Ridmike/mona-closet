@@ -1,7 +1,7 @@
 // app/admin/login/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -12,7 +12,7 @@ import { Mail, Lock, ShieldAlert, LogIn, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 
-export default function AdminLoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -133,5 +133,17 @@ export default function AdminLoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-brand-charcoal text-white font-sans">
+        <div className="w-16 h-16 rounded-full border-4 border-zinc-800 animate-spin border-t-brand-mauve" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
