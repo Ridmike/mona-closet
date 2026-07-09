@@ -10,6 +10,7 @@ import { useCartStore }     from "@/store/useCartStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
 
 const NAV_LINKS = [
+  { label: "Home",       href: "/" },
   { label: "Shop",       href: "/shop" },
   { label: "Categories", href: "/categories" },
   { label: "About",      href: "/about" },
@@ -42,20 +43,23 @@ export function Navbar() {
 
             {/* Desktop nav */}
             <nav className="hidden md:flex items-center gap-8" aria-label="Main navigation">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={cn(
-                    "text-sm font-body font-medium transition-colors duration-200",
-                    pathname.startsWith(link.href)
-                      ? "text-brand-mauve"
-                      : "text-brand-charcoal hover:text-brand-mauve"
-                  )}
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {NAV_LINKS.map((link) => {
+                const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      "text-sm font-body font-medium transition-colors duration-200",
+                      isActive
+                        ? "text-brand-mauve"
+                        : "text-brand-charcoal hover:text-brand-mauve"
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
             </nav>
 
             {/* Actions */}
@@ -127,21 +131,24 @@ export function Navbar() {
           )}
         >
           <nav className="px-4 py-4 flex flex-col gap-1 bg-brand-cream" aria-label="Mobile navigation">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMenuOpen(false)}
-                className={cn(
-                  "px-3 py-2.5 rounded-card text-sm font-body font-medium transition-colors",
-                  pathname.startsWith(link.href)
-                    ? "bg-brand-mist text-brand-mauve"
-                    : "text-brand-charcoal hover:bg-brand-mist hover:text-brand-mauve"
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMenuOpen(false)}
+                  className={cn(
+                    "px-3 py-2.5 rounded-card text-sm font-body font-medium transition-colors",
+                    isActive
+                      ? "bg-brand-mist text-brand-mauve"
+                      : "text-brand-charcoal hover:bg-brand-mist hover:text-brand-mauve"
+                  )}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
             <Link
               href="/wishlist"
               onClick={() => setMenuOpen(false)}
