@@ -1,7 +1,7 @@
 // app/login/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -45,9 +45,13 @@ export default function LoginPage() {
   const [toast, setToast]       = useState<{ type: ToastType; message: string } | null>(null);
   const router = useRouter();
   const { user } = useAuth();
+  useEffect(() => {
+    if (user) {
+      router.push("/");
+    }
+  }, [user, router]);
 
   if (user) {
-    router.push("/");
     return null;
   }
 
@@ -62,9 +66,8 @@ export default function LoginPage() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      showToast("success", "Welcome back! You are now signed in.");
-      // Brief pause so user sees success toast before navigation
-      setTimeout(() => router.push("/"), 1200);
+      // Brief pause so user sees transition, redirecting to home with parameter
+      setTimeout(() => router.push("/?login=success"), 300);
     } catch (err: any) {
       console.error(err);
       if (

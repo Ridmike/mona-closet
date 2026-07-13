@@ -52,6 +52,7 @@ export interface Category {
   slug:        string;
   description?: string | null;
   image?:      string | null;
+  hoverImage?: string | null;
   parent?:     string | null;          // parent category id
   order:       number;
 }

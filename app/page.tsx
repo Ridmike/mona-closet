@@ -3,7 +3,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Button } from "@/components/ui/Button";
 import {
@@ -68,13 +69,37 @@ function useScrollReveal(deps: any[] = []) {
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
+function LoginSuccessBannerDetector({ onTrigger }: { onTrigger: () => void }) {
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    if (searchParams.get("login") === "success") {
+      onTrigger();
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  }, [searchParams, onTrigger]);
+  return null;
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 export default function Home() {
   const [activeTab, setActiveTab] = useState<"all" | "dresses" | "tops & blouses" | "accessories">("all");
   const [products, setProducts]   = useState<Product[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [bannerVisible, setBannerVisible] = useState(true);
+  const [showSuccessBanner, setShowSuccessBanner] = useState(false);
 
   useScrollReveal([categories, products]);
+
+  // Auto dismiss success banner after 5s
+  useEffect(() => {
+    if (showSuccessBanner) {
+      const timer = setTimeout(() => {
+        setShowSuccessBanner(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessBanner]);
 
   useEffect(() => {
     async function loadData() {
@@ -119,6 +144,24 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-brand-cream text-brand-charcoal overflow-x-hidden">
+      <Suspense fallback={null}>
+        <LoginSuccessBannerDetector onTrigger={() => setShowSuccessBanner(true)} />
+      </Suspense>
+
+      {/* ── SUCCESS LOGIN BANNER ─────────────────────────────────────────── */}
+      {showSuccessBanner && (
+        <div className="bg-emerald-600 text-white py-3.5 px-4 text-center font-body text-sm font-semibold flex items-center justify-center gap-2 relative z-50 animate-fade-in-up">
+          <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-xs shrink-0 font-sans">✓</span>
+          <span>Welcome back! You have logged in successfully.</span>
+          <button
+            onClick={() => setShowSuccessBanner(false)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/20 transition-colors"
+            aria-label="Dismiss banner"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* ── PROMO TICKER BAR ──────────────────────────────────────────────── */}
       {bannerVisible && (
