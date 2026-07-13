@@ -83,5 +83,13 @@ service cloud.firestore {
       allow create: if true;
       allow read, update, delete: if isAdmin();
     }
+
+    // Rules for the settings collection
+    match /settings/{settingId} {
+      // Anyone can read site settings. Only admins can edit them.
+      allow read: if true;
+      allow write: if isAdmin();
+      
+    }
   }
 }

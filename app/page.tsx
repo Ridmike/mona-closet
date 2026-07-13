@@ -14,6 +14,7 @@ import {
 import type { ProductCardData, Product } from "@/types";
 import { getProducts } from "@/lib/db/products";
 import { getCategories } from "@/lib/db/categories";
+import { getSiteSettings } from "@/lib/db/content";
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 const TICKER_ITEMS = [
@@ -88,6 +89,8 @@ export default function Home() {
   const [categories, setCategories] = useState<any[]>([]);
   const [bannerVisible, setBannerVisible] = useState(true);
   const [showSuccessBanner, setShowSuccessBanner] = useState(false);
+  const [showPromoTicker, setShowPromoTicker] = useState(true);
+  const [showSaleBanner, setShowSaleBanner]   = useState(true);
 
   useScrollReveal([categories, products]);
 
@@ -104,11 +107,15 @@ export default function Home() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [prodList, catList] = await Promise.all([
+        const [prodList, catList, siteConfig] = await Promise.all([
           getProducts({ limitCount: 8, publishedOnly: true }),
           getCategories(),
+          getSiteSettings(),
         ]);
         setProducts(prodList);
+        setShowPromoTicker(siteConfig.showPromoTicker);
+        setShowSaleBanner(siteConfig.showSaleBanner);
+        
         if (catList.length > 0) {
           setCategories(catList.slice(0, 3).map((c, idx) => ({
             name: c.name,
@@ -164,7 +171,7 @@ export default function Home() {
       )}
 
       {/* ── PROMO TICKER BAR ──────────────────────────────────────────────── */}
-      {bannerVisible && (
+      {showPromoTicker && bannerVisible && (
         <div className="relative bg-gradient-to-r from-brand-plum via-brand-mauve to-brand-plum text-white overflow-hidden py-2.5">
           <div className="overflow-hidden">
             <div className="animate-marquee gap-12 items-center">
@@ -186,32 +193,34 @@ export default function Home() {
       )}
 
       {/* ── SALE PROMO BANNER ─────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden h-[72px] md:h-[88px] flex items-center">
-        <Image
-          src="/images/promo-banner.png"
-          alt="Sale promotion banner"
-          fill
-          className="object-cover object-center"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-brand-plum/85 via-brand-plum/60 to-transparent" />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-1.5 bg-brand-blush text-brand-plum text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full font-body shrink-0 animate-bounce-slow">
-              <Zap className="w-3 h-3" /> Limited Sale
+      {showSaleBanner && (
+        <section className="relative overflow-hidden h-[72px] md:h-[88px] flex items-center">
+          <Image
+            src="/images/promo-banner.png"
+            alt="Sale promotion banner"
+            fill
+            className="object-cover object-center"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-plum/85 via-brand-plum/60 to-transparent" />
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:flex items-center gap-1.5 bg-brand-blush text-brand-plum text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full font-body shrink-0 animate-bounce-slow">
+                <Zap className="w-3 h-3" /> Limited Sale
+              </div>
+              <p className="text-white font-display text-xl md:text-2xl font-medium leading-none">
+                🎀 Up to <span className="text-brand-blush font-bold">50% Off</span> — New Season Styles
+              </p>
             </div>
-            <p className="text-white font-display text-xl md:text-2xl font-medium leading-none">
-              🎀 Up to <span className="text-brand-blush font-bold">50% Off</span> — New Season Styles
-            </p>
+            <Link
+              href="/shop"
+              className="hidden sm:inline-flex shrink-0 items-center gap-1.5 bg-white text-brand-plum text-xs font-bold font-body px-5 py-2.5 rounded-full hover:bg-brand-blush transition-colors duration-200 group shadow-md"
+            >
+              Shop Sale <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+            </Link>
           </div>
-          <Link
-            href="/shop"
-            className="hidden sm:inline-flex shrink-0 items-center gap-1.5 bg-white text-brand-plum text-xs font-bold font-body px-5 py-2.5 rounded-full hover:bg-brand-blush transition-colors duration-200 group shadow-md"
-          >
-            Shop Sale <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── HERO SECTION ──────────────────────────────────────────────────── */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden">
@@ -375,7 +384,7 @@ export default function Home() {
                   </div>
                   {/* Content */}
                   <div className="relative z-10 text-white flex flex-col items-start gap-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-400">
-                    <h3 className="text-2xl font-display font-medium drop-shadow-sm">{category.name}</h3>
+                    <h3 className="text-2xl font-display font-medium drop-shadow-sm text-white">{category.name}</h3>
                     <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase text-white/90 border-b border-white/50 pb-0.5 group-hover:gap-2.5 group-hover:border-white transition-all duration-300 font-body">
                       Shop Now <ChevronRight className="w-3.5 h-3.5" />
                     </span>
@@ -398,7 +407,7 @@ export default function Home() {
             <div className="inline-flex items-center gap-2 bg-brand-blush/20 border border-brand-blush/40 text-brand-blush text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full font-body">
               <Tag className="w-3.5 h-3.5" /> Flash Sale
             </div>
-            <h2 className="text-3xl md:text-4xl font-display font-medium">
+            <h2 className="text-3xl md:text-4xl font-display font-medium text-white">
               Up to <span className="text-brand-blush">50% Off</span> — This Week Only
             </h2>
             <p className="text-sm font-body text-white/70 max-w-lg">
@@ -561,7 +570,7 @@ export default function Home() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-blush/15 border border-brand-blush/30 text-brand-blush text-xs font-semibold uppercase tracking-widest font-body">
             <Heart className="w-3.5 h-3.5" /> Stay Connected
           </div>
-          <h2 className="text-3xl md:text-4xl font-display font-medium">Stay in Style, Every Week</h2>
+          <h2 className="text-3xl md:text-4xl font-display font-medium text-white">Stay in Style, Every Week</h2>
           <p className="text-sm font-body text-white/65 max-w-md mx-auto leading-relaxed">
             Subscribe for weekly new arrivals, private sales, and exclusive style tips delivered straight to your inbox.
           </p>

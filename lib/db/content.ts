@@ -149,3 +149,39 @@ export async function deleteContactMessage(id: string): Promise<void> {
   const docRef = doc(db, "contact_messages", id);
   await deleteDoc(docRef);
 }
+
+// ── Site Settings ─────────────────────────────────────────────────────────────
+
+export interface SiteSettings {
+  showPromoTicker: boolean;
+  showSaleBanner: boolean;
+}
+
+export async function getSiteSettings(): Promise<SiteSettings> {
+  try {
+    const docRef = doc(db, "settings", "site_config");
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      return {
+        showPromoTicker: true,
+        showSaleBanner: true,
+      };
+    }
+    const data = docSnap.data();
+    return {
+      showPromoTicker: data.showPromoTicker ?? true,
+      showSaleBanner: data.showSaleBanner ?? true,
+    };
+  } catch (err) {
+    console.error("Error fetching site settings:", err);
+    return {
+      showPromoTicker: true,
+      showSaleBanner: true,
+    };
+  }
+}
+
+export async function saveSiteSettings(payload: SiteSettings): Promise<void> {
+  const docRef = doc(db, "settings", "site_config");
+  await setDoc(docRef, payload);
+}

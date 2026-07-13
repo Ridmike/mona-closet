@@ -15,7 +15,8 @@ import {
   Store,
   Package,
   ClipboardList,
-  MessageSquare
+  MessageSquare,
+  Settings
 } from "lucide-react";
 import { getContactMessages } from "@/lib/db/content";
 
@@ -53,6 +54,7 @@ export default function AdminLayout({
     { label: "Customers", href: "/admin/customers", icon: Users },
     { label: "Messages",  href: "/admin/messages",  icon: MessageSquare, badge: unreadMessages },
     { label: "Staff Users",href: "/admin/users",   icon: Users, roles: ["Owner", "Manager"] },
+    { label: "Settings",  href: "/admin/settings",  icon: Settings },
   ];
 
   return (
