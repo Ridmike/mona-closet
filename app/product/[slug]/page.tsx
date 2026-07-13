@@ -198,14 +198,21 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ slug:
               </h1>
               
               {/* Price display */}
-              <div className="flex items-baseline gap-3 pt-2">
-                <span className="text-2xl font-bold text-brand-plum font-display">
-                  {formatPrice(unitPrice)}
-                </span>
-                {hasDiscount && (
-                  <span className="text-sm text-brand-charcoal/40 line-through font-body">
-                    {formatPrice(product.price)}
+              <div className="flex flex-col gap-1 pt-2">
+                <div className="flex items-baseline gap-3">
+                  <span className="text-3xl sm:text-4xl font-bold text-brand-plum font-display">
+                    {formatPrice(unitPrice)}
                   </span>
+                  {hasDiscount && (
+                    <span className="text-base text-brand-charcoal/45 line-through font-body">
+                      {formatPrice(product.price)}
+                    </span>
+                  )}
+                </div>
+                {hasDiscount && (
+                  <div className="text-[11px] font-semibold text-emerald-650 font-body">
+                    Save {formatPrice(product.price - unitPrice)} ({product.discount}% Off)
+                  </div>
                 )}
               </div>
             </div>
@@ -357,6 +364,38 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ slug:
                 <div>
                   <p className="font-bold text-brand-plum">Guaranteed Customer Care</p>
                   <p className="text-zinc-500 mt-0.5">Confirm order details via WhatsApp. Easy sizing exchanges.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Payment methods */}
+            <div className="border border-brand-sand/40 p-4 rounded-card text-xs text-brand-charcoal bg-white space-y-3 font-body">
+              <p className="font-semibold text-brand-plum uppercase tracking-wider text-[10px] text-zinc-400">Accepted Payment Methods</p>
+              <div className="flex flex-wrap gap-2 pt-1 items-center">
+                {/* Cash on Delivery */}
+                <div className="flex items-center gap-1 bg-zinc-50 border border-zinc-200 rounded px-2.5 py-1 text-[11px] font-medium text-zinc-600" title="Cash on Delivery">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Cash on Delivery (COD)
+                </div>
+                
+                {/* Credit/Debit Cards */}
+                <div className="flex items-center gap-1.5 bg-zinc-50 border border-zinc-200 rounded px-2.5 py-1 text-[11px] font-medium text-zinc-600" title="Visa / Mastercard">
+                  <svg className="w-4 h-3 text-blue-800" viewBox="0 0 24 16" fill="currentColor">
+                    <rect width="24" height="16" rx="2" fill="#1A1F71"/>
+                    <path d="M9.3 11.6l1.2-7.2h1.9l-1.2 7.2H9.3zm5.7-6.9c-.3-.2-.8-.4-1.4-.4-1.4 0-2.4.8-2.4 1.8 0 1.3 1.2 1.3 1.2 2 .1.6-.5 1-1.2 1-.6 0-1.1-.3-1.4-.5l-.3 1.5c.4.2 1.1.4 1.8.4 1.5 0 2.5-.7 2.5-1.9 0-1.3-1.2-1.4-1.2-2 0-.5.4-.9 1.1-.9.5 0 .9.2 1.1.3l.2-1.7zm4.1 3.5l.8-2.2.4 2.2h-1.2zm1.9 3.4l-1.5-7.2h-1.5c-.4 0-.8.2-1 .6l-2.8 6.6h2l.4-1.1h2.4l.2 1.1h2z" fill="#FFF"/>
+                  </svg>
+                  Cards (Visa/Master)
+                </div>
+                
+                {/* Koko Pay */}
+                <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded px-2.5 py-1 text-[11px] font-semibold text-emerald-800" title="Split in 3 with Koko">
+                  <span className="text-[10px] bg-emerald-500 text-white font-black px-1 rounded leading-none py-0.5">k.</span>
+                  Koko Pay (3 split payments)
+                </div>
+
+                {/* Bank Transfer */}
+                <div className="flex items-center gap-1 bg-zinc-50 border border-zinc-200 rounded px-2.5 py-1 text-[11px] font-medium text-zinc-650" title="Bank Transfer / Deposit">
+                  Bank Transfer
                 </div>
               </div>
             </div>
