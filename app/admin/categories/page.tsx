@@ -32,6 +32,7 @@ export default function AdminCategoriesPage() {
   const [formSlug, setFormSlug] = useState("");
   const [formDescription, setFormDescription] = useState("");
   const [formImage, setFormImage] = useState("");
+  const [formHoverImage, setFormHoverImage] = useState("");
   const [formParent, setFormParent] = useState("");
   const [formOrder, setFormOrder] = useState(0);
 
@@ -63,6 +64,7 @@ export default function AdminCategoriesPage() {
     setFormSlug("");
     setFormDescription("");
     setFormImage("");
+    setFormHoverImage("");
     setFormParent("");
     setFormOrder(categories.length + 1);
     setShowFormModal(true);
@@ -74,6 +76,7 @@ export default function AdminCategoriesPage() {
     setFormSlug(category.slug);
     setFormDescription(category.description || "");
     setFormImage(category.image || "");
+    setFormHoverImage(category.hoverImage || "");
     setFormParent(category.parent || "");
     setFormOrder(category.order);
     setShowFormModal(true);
@@ -101,6 +104,7 @@ export default function AdminCategoriesPage() {
       slug: formSlug,
       description: formDescription || null,
       image: formImage || null,
+      hoverImage: formHoverImage || null,
       parent: formParent || null,
       order: Number(formOrder)
     };
@@ -272,7 +276,7 @@ export default function AdminCategoriesPage() {
                 </div>
               </div>
               <div className="flex flex-col gap-1.5 text-zinc-700">
-                <label className="text-xs font-semibold font-body">Category Image</label>
+                <label className="text-xs font-semibold font-body">Category Image (Primary)</label>
                 <div className="flex items-center gap-3">
                   {formImage && (
                     <div className="relative w-16 h-16 rounded-card overflow-hidden border border-brand-sand shrink-0 bg-brand-cream flex items-center justify-center">
@@ -322,6 +326,62 @@ export default function AdminCategoriesPage() {
                     >
                       <Upload className="w-4 h-4 text-zinc-400" />
                       {formImage ? "Change Image" : "Upload Image to Cloudinary"}
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5 text-zinc-700">
+                <label className="text-xs font-semibold font-body">Category Image (Hover / Secondary)</label>
+                <div className="flex items-center gap-3">
+                  {formHoverImage && (
+                    <div className="relative w-16 h-16 rounded-card overflow-hidden border border-brand-sand shrink-0 bg-brand-cream flex items-center justify-center">
+                      <img src={formHoverImage} alt="Preview" className="object-cover w-full h-full" />
+                      <button
+                        type="button"
+                        onClick={() => setFormHoverImage("")}
+                        className="absolute inset-0 bg-black/50 text-white opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center text-xs font-semibold"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={!canModify}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+
+                        const formData = new FormData();
+                        formData.append("file", file);
+
+                        try {
+                          toast("Uploading hover image to Cloudinary...", "info");
+                          const res = await fetch("/api/upload", {
+                            method: "POST",
+                            body: formData
+                          });
+                          const data = await res.json();
+                          if (data.error) throw new Error(data.error);
+                          setFormHoverImage(data.url);
+                          toast("Hover image uploaded successfully!", "success");
+                        } catch (err: any) {
+                          toast(err.message || "Failed to upload hover image", "error");
+                        }
+                      }}
+                      className="hidden"
+                      id="category-hover-image-upload"
+                    />
+                    <label
+                      htmlFor="category-hover-image-upload"
+                      className={`flex items-center justify-center px-4 py-2.5 border border-dashed border-zinc-300 rounded-card text-xs font-semibold hover:border-brand-mauve cursor-pointer transition-colors bg-white text-zinc-600 gap-1.5 ${!canModify ? "opacity-50 pointer-events-none" : ""
+                        }`}
+                    >
+                      <Upload className="w-4 h-4 text-zinc-400" />
+                      {formHoverImage ? "Change Hover Image" : "Upload Hover Image to Cloudinary"}
                     </label>
                   </div>
                 </div>

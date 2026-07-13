@@ -20,6 +20,7 @@ function docToCategory(docData: DocumentData, id: string): Category {
     slug: docData.slug || "",
     description: docData.description,
     image: docData.image,
+    hoverImage: docData.hoverImage,
     parent: docData.parent,
     order: docData.order || 0,
   };
