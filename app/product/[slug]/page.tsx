@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { formatPrice, discountedPrice } from "@/lib/utils";
 import { Heart, ShoppingBag, Truck, ShieldAlert, Award, ChevronRight, Check } from "lucide-react";
 import Link from "next/link";
-import { toast } from "sonner"; // we see sonner in package.json!
+import { useToast } from "@/components/shared/Toast";
 
 export default function ProductDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
@@ -29,6 +29,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ slug:
   const addItem = useCartStore(state => state.addItem);
   const toggleWishlist = useWishlistStore(state => state.toggleWishlist);
   const wishlistProductIds = useWishlistStore(state => state.productIds);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchProduct() {
@@ -104,17 +105,17 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ slug:
 
   const handleAddToCart = () => {
     if (!selectedSize || !selectedColorName) {
-      toast.error("Please select a size and color variant.");
+      toast("Please select a size and color variant.", "error");
       return;
     }
 
     if (!selectedVariant) {
-      toast.error("Selected combination is unavailable.");
+      toast("Selected combination is unavailable.", "error");
       return;
     }
 
     if (isOutOfStock) {
-      toast.error("This variant is currently out of stock.");
+      toast("This variant is currently out of stock.", "error");
       return;
     }
 
@@ -131,7 +132,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ slug:
     };
 
     addItem(cartItem);
-    toast.success(`${product.name} (${selectedSize}, ${selectedColorName}) added to cart!`);
+    toast(`${product.name} (${selectedSize}, ${selectedColorName}) added to cart!`, "success");
   };
 
   return (
@@ -336,9 +337,9 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ slug:
                 onClick={() => {
                   toggleWishlist(product.id);
                   if (isFavorited) {
-                    toast.success("Removed from wishlist.");
+                    toast("Removed from wishlist.", "info");
                   } else {
-                    toast.success("Added to wishlist.");
+                    toast("Added to wishlist successfully!", "success");
                   }
                 }}
                 className={`h-12 w-12 flex items-center justify-center border border-brand-sand rounded-card bg-white hover:bg-zinc-50 shrink-0 transition-colors ${

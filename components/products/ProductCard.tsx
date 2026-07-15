@@ -9,6 +9,7 @@ import { ShoppingCart, Eye } from "lucide-react";
 import { cn, formatPrice, discountedPrice } from "@/lib/utils";
 import type { ProductCardData } from "@/types";
 import { useWishlistStore } from "@/store/useWishlistStore";
+import { useToast } from "@/components/shared/Toast";
 
 interface ProductCardProps {
   product:   ProductCardData;
@@ -17,6 +18,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, className }: ProductCardProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [hovered, setHovered]     = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
 
@@ -91,6 +93,11 @@ export function ProductCard({ product, className }: ProductCardProps) {
           onClick={(e) => {
             e.preventDefault();
             toggleWishlist(product.id);
+            if (isWishlisted) {
+              toast(`${product.name} removed from wishlist.`, "info");
+            } else {
+              toast(`${product.name} added to wishlist!`, "success");
+            }
           }}
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
           className={cn(

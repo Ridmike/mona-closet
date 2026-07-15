@@ -28,21 +28,21 @@ const TICKER_ITEMS = [
 
 const REVIEWS = [
   { name: "Dilini R.", location: "Colombo", rating: 5, comment: "Absolutely love the fabric quality of the linen top! Fits perfectly and delivery took only 2 days. Will order again!" },
-  { name: "Senuri W.", location: "Kandy",   rating: 5, comment: "Ordered a midi dress and it was identical to the picture. Super easy checkout and love the COD service." },
+  { name: "Senuri W.", location: "Kandy", rating: 5, comment: "Ordered a midi dress and it was identical to the picture. Super easy checkout and love the COD service." },
   { name: "Maheshi F.", location: "Negombo", rating: 5, comment: "Finally a professional site for Mona's Closet! Buying is so much faster now than waiting on Messenger replies." },
 ];
 
 const DEFAULT_CATEGORIES = [
-  { name: "Dresses",       count: "Explore", image: "/images/floral-midi-dress.png", hoverImage: "/images/pastel-wrap-dress.png", href: "/shop?category=dresses",      color: "bg-[#F8F0F3]", accent: "from-rose-900/80" },
-  { name: "Tops & Blouses", count: "Explore", image: "/images/chic-linen-top.png",   hoverImage: "/images/hero.png",             href: "/shop?category=tops-blouses", color: "bg-[#FAF7F4]", accent: "from-neutral-900/80" },
-  { name: "Accessories",   count: "Explore", image: "/images/straw-handbag.png",     hoverImage: "/images/floral-midi-dress.png", href: "/shop?category=accessories",  color: "bg-[#EDE6DE]", accent: "from-amber-900/80" },
+  { name: "Dresses", count: "Explore", image: "/images/floral-midi-dress.png", hoverImage: "/images/pastel-wrap-dress.png", href: "/shop?category=dresses", color: "bg-[#F8F0F3]", accent: "from-rose-900/80" },
+  { name: "Tops & Blouses", count: "Explore", image: "/images/chic-linen-top.png", hoverImage: "/images/hero.png", href: "/shop?category=tops-blouses", color: "bg-[#FAF7F4]", accent: "from-neutral-900/80" },
+  { name: "Accessories", count: "Explore", image: "/images/straw-handbag.png", hoverImage: "/images/floral-midi-dress.png", href: "/shop?category=accessories", color: "bg-[#EDE6DE]", accent: "from-amber-900/80" },
 ];
 
 const FEATURES = [
-  { icon: <Truck className="w-5 h-5" />,        title: "Islandwide COD",     desc: "Cash on Delivery available all over Sri Lanka" },
-  { icon: <MessageSquare className="w-5 h-5" />, title: "WhatsApp Orders",    desc: "Place orders instantly via WhatsApp chat" },
-  { icon: <Award className="w-5 h-5" />,         title: "Premium Quality",    desc: "Handpicked, quality-checked pieces only" },
-  { icon: <Heart className="w-5 h-5" />,         title: "Easy Checkout",      desc: "Add to cart and buy in under 60 seconds" },
+  { icon: <Truck className="w-5 h-5" />, title: "Islandwide COD", desc: "Cash on Delivery available all over Sri Lanka" },
+  { icon: <MessageSquare className="w-5 h-5" />, title: "WhatsApp Orders", desc: "Place orders instantly via WhatsApp chat" },
+  { icon: <Award className="w-5 h-5" />, title: "Premium Quality", desc: "Handpicked, quality-checked pieces only" },
+  { icon: <Heart className="w-5 h-5" />, title: "Easy Checkout", desc: "Add to cart and buy in under 60 seconds" },
 ];
 
 // ─── Scroll-reveal hook ────────────────────────────────────────────────────────
@@ -85,14 +85,14 @@ function LoginSuccessBannerDetector({ onTrigger }: { onTrigger: () => void }) {
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function Home() {
   const [activeTab, setActiveTab] = useState<"all" | "dresses" | "tops & blouses" | "accessories">("all");
-  const [products, setProducts]   = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [bannerVisible, setBannerVisible] = useState(true);
   const [showSuccessBanner, setShowSuccessBanner] = useState(false);
   const [showPromoTicker, setShowPromoTicker] = useState(true);
-  const [showSaleBanner, setShowSaleBanner]   = useState(true);
+  const [showSaleBanner, setShowSaleBanner] = useState(true);
 
-  useScrollReveal([categories, products]);
+  useScrollReveal([categories, products, activeTab]);
 
   // Auto dismiss success banner after 5s
   useEffect(() => {
@@ -115,7 +115,7 @@ export default function Home() {
         setProducts(prodList);
         setShowPromoTicker(siteConfig.showPromoTicker);
         setShowSaleBanner(siteConfig.showSaleBanner);
-        
+
         if (catList.length > 0) {
           setCategories(catList.slice(0, 3).map((c, idx) => ({
             name: c.name,
@@ -282,9 +282,9 @@ export default function Home() {
             {/* Stats row */}
             <div className="flex flex-wrap gap-8 pt-6 border-t border-white/15 animate-fade-in-up delay-500">
               {[
-                { val: "5k+",  label: "Happy Shoppers" },
+                { val: "5k+", label: "Happy Shoppers" },
                 { val: "100%", label: "COD Islandwide" },
-                { val: "50%",  label: "Off Sale Items" },
+                { val: "50%", label: "Off Sale Items" },
               ].map((s, i) => (
                 <div key={i}>
                   <p className="text-3xl font-display font-bold text-brand-blush">{s.val}</p>
@@ -437,11 +437,10 @@ export default function Home() {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-5 py-2 text-xs font-semibold font-body rounded-full capitalize transition-all duration-200 ${
-                    activeTab === tab
+                  className={`px-5 py-2 text-xs font-semibold font-body rounded-full capitalize transition-all duration-200 ${activeTab === tab
                       ? "bg-brand-mauve text-white shadow-sm scale-105"
                       : "text-brand-charcoal/65 hover:text-brand-charcoal hover:bg-white/60"
-                  }`}
+                    }`}
                 >
                   {tab === "tops & blouses" ? "Tops" : tab}
                 </button>
@@ -487,9 +486,9 @@ export default function Home() {
               </div>
               <ul className="space-y-5">
                 {[
-                  { n: "01", title: "Choose & Add to Cart",          desc: "Pick size, colour, and add to cart in seconds." },
-                  { n: "02", title: "WhatsApp Confirmation",         desc: "We confirm your order instantly on WhatsApp." },
-                  { n: "03", title: "Cash on Delivery",              desc: "Pay only when your parcel is in your hands." },
+                  { n: "01", title: "Choose & Add to Cart", desc: "Pick size, colour, and add to cart in seconds." },
+                  { n: "02", title: "WhatsApp Confirmation", desc: "We confirm your order instantly on WhatsApp." },
+                  { n: "03", title: "Cash on Delivery", desc: "Pay only when your parcel is in your hands." },
                 ].map((step, i) => (
                   <li key={i} className="flex gap-4 group">
                     <span className="w-9 h-9 rounded-xl bg-brand-blush/30 text-brand-plum flex items-center justify-center shrink-0 font-bold text-sm font-body group-hover:bg-brand-blush group-hover:scale-110 transition-all duration-300">
