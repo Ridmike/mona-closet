@@ -143,20 +143,22 @@ export function ProductCard({ product, className }: ProductCardProps) {
       </Link>
 
       {/* ── Details ────────────────────────────────────────────────── */}
-      <div className="flex flex-col gap-1 px-3.5 py-3">
-        <span className="text-[10px] text-brand-mauve/80 font-body uppercase tracking-widest font-semibold">
-          {product.category}
-        </span>
+      <div className="flex-1 flex flex-col justify-between px-3.5 py-3 pt-2.5">
+        <div className="flex flex-col gap-1">
+          <span className="text-[10px] text-brand-mauve/80 font-body uppercase tracking-widest font-semibold">
+            {product.category}
+          </span>
 
-        <Link
-          href={`/product/${product.slug}`}
-          className="text-sm font-medium text-brand-charcoal font-body line-clamp-2 hover:text-brand-mauve transition-colors leading-snug"
-        >
-          {product.name}
-        </Link>
+          <Link
+            href={`/product/${product.slug}`}
+            className="text-sm font-medium text-brand-charcoal font-body line-clamp-2 hover:text-brand-mauve transition-colors leading-snug"
+          >
+            {product.name}
+          </Link>
+        </div>
 
-        <div className="flex items-center justify-between mt-1.5">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-1 mt-2">
+          <div className="flex items-baseline gap-2 flex-wrap">
             <span className="text-base font-bold text-brand-plum font-display">
               {formatPrice(finalPrice)}
             </span>
@@ -169,7 +171,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
           {/* In-stock dot */}
           {!isOutOfStock && (
             <span className="flex items-center gap-1 text-[10px] text-emerald-600 font-body font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" />
               In Stock
             </span>
           )}

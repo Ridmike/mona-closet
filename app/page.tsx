@@ -452,8 +452,8 @@ export default function Home() {
           {/* Product grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {filteredProducts.map((product, idx) => (
-              <div key={product.id} data-reveal data-delay={String((idx % 4) * 100)} className="reveal">
-                <ProductCard product={product} />
+              <div key={product.id} data-reveal data-delay={String((idx % 4) * 100)} className="reveal flex">
+                <ProductCard product={product} className="w-full h-full" />
               </div>
             ))}
           </div>
