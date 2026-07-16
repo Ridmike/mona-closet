@@ -20,7 +20,7 @@ import {
   CheckCheck,
   Circle,
 } from "lucide-react";
-import { toast } from "sonner";
+import { useToast } from "@/components/shared/Toast";
 
 type Tab = "all" | "unread" | "read";
 
@@ -31,6 +31,7 @@ export default function MessagesPage() {
   const [expanded, setExpanded]     = useState<string | null>(null);
   const [deleting, setDeleting]     = useState<string | null>(null);
   const [toggling, setToggling]     = useState<string | null>(null);
+  const { toast }                   = useToast();
 
   const load = async () => {
     setLoading(true);
@@ -57,9 +58,9 @@ export default function MessagesPage() {
       setMessages(prev =>
         prev.map(m => m.id === msg.id ? { ...m, read: !m.read } : m)
       );
-      toast.success(msg.read ? "Marked as unread" : "Marked as read");
+      toast(msg.read ? "Marked as unread" : "Marked as read", "success");
     } catch {
-      toast.error("Failed to update status.");
+      toast("Failed to update status.", "error");
     } finally {
       setToggling(null);
     }
@@ -72,9 +73,9 @@ export default function MessagesPage() {
       await deleteContactMessage(id);
       setMessages(prev => prev.filter(m => m.id !== id));
       if (expanded === id) setExpanded(null);
-      toast.success("Message deleted.");
+      toast("Message deleted.", "success");
     } catch {
-      toast.error("Failed to delete message.");
+      toast("Failed to delete message.", "error");
     } finally {
       setDeleting(null);
     }
@@ -101,9 +102,9 @@ export default function MessagesPage() {
     try {
       await Promise.all(unread.map(m => markMessageRead(m.id, true)));
       setMessages(prev => prev.map(m => ({ ...m, read: true })));
-      toast.success(`${unread.length} message${unread.length > 1 ? "s" : ""} marked as read.`);
+      toast(`${unread.length} message${unread.length > 1 ? "s" : ""} marked as read.`, "success");
     } catch {
-      toast.error("Failed to mark all as read.");
+      toast("Failed to mark all as read.", "error");
     }
   };
 

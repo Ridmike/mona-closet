@@ -6,7 +6,7 @@ import { submitContactMessage } from "@/lib/db/content";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Mail, MapPin, MessageSquare, Phone, Send, CheckCircle } from "lucide-react";
-import { toast } from "sonner";
+import { useToast } from "@/components/shared/Toast";
 
 export default function ContactPage() {
   // Form fields
@@ -16,11 +16,12 @@ export default function ContactPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !subject || !message) {
-      toast.error("Please fill in all fields.");
+      toast("Please fill in all fields.", "error");
       return;
     }
 
@@ -34,7 +35,7 @@ export default function ContactPage() {
       });
       
       setSuccess(true);
-      toast.success("Message submitted successfully!");
+      toast("Message submitted successfully!", "success");
       // Reset
       setName("");
       setEmail("");
@@ -42,7 +43,7 @@ export default function ContactPage() {
       setMessage("");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to submit inquiry. Please try again.");
+      toast("Failed to submit inquiry. Please try again.", "error");
     } finally {
       setLoading(false);
     }

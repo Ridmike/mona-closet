@@ -19,7 +19,7 @@ import {
 } from "@/lib/utils";
 import { CheckCircle2, Lock, ShieldCheck, Truck, ShoppingBag, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { toast } from "sonner";
+import { useToast } from "@/components/shared/Toast";
 import { db, auth } from "@/lib/firebase";
 import { collection, doc, setDoc, getDocs, query, where } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -29,6 +29,7 @@ export default function CheckoutPage() {
   const cartItems = useCartStore(state => state.items);
   const clearCart = useCartStore(state => state.clearCart);
   const router = useRouter();
+  const { toast } = useToast();
 
   // Shipping form fields
   const [fullName, setFullName] = useState("");
@@ -73,22 +74,22 @@ export default function CheckoutPage() {
     e.preventDefault();
 
     if (cartItems.length === 0) {
-      toast.error("Your cart is empty.");
+      toast("Your cart is empty.", "error");
       return;
     }
 
     if (!email || !email.includes("@")) {
-      toast.error("Please enter a valid email address.");
+      toast("Please enter a valid email address.", "error");
       return;
     }
 
     if (!user && (!password || password.length < 6)) {
-      toast.error("Please enter a password of at least 6 characters to create your account.");
+      toast("Please enter a password of at least 6 characters to create your account.", "error");
       return;
     }
 
     if (!isValidSLPhone(phone)) {
-      toast.error("Please enter a valid Sri Lankan mobile number (e.g. 0771234567).");
+      toast("Please enter a valid Sri Lankan mobile number (e.g. 0771234567).", "error");
       return;
     }
 
@@ -128,11 +129,11 @@ export default function CheckoutPage() {
           });
         } catch (authErr: any) {
           if (authErr.code === "auth/email-already-in-use") {
-            toast.error("This email is already registered. Please sign in to place your order.");
+            toast("This email is already registered. Please sign in to place your order.", "error");
             setLoading(false);
             return;
           } else if (authErr.code === "auth/weak-password") {
-            toast.error("Password is too weak. Please use a stronger password.");
+            toast("Password is too weak. Please use a stronger password.", "error");
             setLoading(false);
             return;
           } else {
@@ -191,11 +192,11 @@ export default function CheckoutPage() {
 
       // 4. Trigger success screen
       setOrderSuccess(orderNumber);
-      toast.success("Order placed successfully!");
+      toast("Order placed successfully!", "success");
       
     } catch (err) {
       console.error(err);
-      toast.error("An error occurred while placing the order. Please try again.");
+      toast("An error occurred while placing the order. Please try again.", "error");
     } finally {
       setLoading(false);
     }

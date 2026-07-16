@@ -23,7 +23,7 @@ import {
   ClipboardList
 } from "lucide-react";
 import { formatDate, formatPrice } from "@/lib/utils";
-import { toast } from "sonner";
+import { useToast } from "@/components/shared/Toast";
 
 export default function AccountPage() {
   return (
@@ -44,6 +44,7 @@ function AccountDashboard() {
   const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (profile) {
@@ -79,10 +80,10 @@ function AccountDashboard() {
         displayName,
         phone
       });
-      toast.success("Profile updated successfully!");
+      toast("Profile updated successfully!", "success");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to update profile details.");
+      toast("Failed to update profile details.", "error");
     } finally {
       setSavingProfile(false);
     }
@@ -90,7 +91,7 @@ function AccountDashboard() {
 
   const handleLogout = async () => {
     await logout();
-    toast.success("Logged out successfully.");
+    toast("Logged out successfully.", "success");
   };
 
   return (

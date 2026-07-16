@@ -6,12 +6,13 @@ import { Button } from "@/components/ui/Button";
 import { formatPrice, discountedPrice, cartSubtotal, computeShipping } from "@/lib/utils";
 import { ShoppingBag, Trash2, ArrowRight, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { toast } from "sonner";
+import { useToast } from "@/components/shared/Toast";
 
 export default function CartPage() {
   const cartItems = useCartStore(state => state.items);
   const updateQuantity = useCartStore(state => state.updateQuantity);
   const removeItem = useCartStore(state => state.removeItem);
+  const { toast } = useToast();
 
   // Subtotal, shipping, total
   const subtotal = cartSubtotal(cartItems);
@@ -25,7 +26,7 @@ export default function CartPage() {
 
   const handleRemove = (productId: string, variantId: string, name: string) => {
     removeItem(productId, variantId);
-    toast.success(`${name} removed from cart.`);
+    toast(`${name} removed from cart.`, "info");
   };
 
   return (

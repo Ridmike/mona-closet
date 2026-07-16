@@ -11,12 +11,13 @@ import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, ShoppingBag, Trash2, ArrowRight, Sparkles } from "lucide-react";
-import { toast } from "sonner";
+import { useToast } from "@/components/shared/Toast";
 
 export default function WishlistPage() {
   const wishlistIds    = useWishlistStore(state => state.productIds);
   const toggleWishlist = useWishlistStore(state => state.toggleWishlist);
   const addToCart      = useCartStore(state => state.addItem);
+  const { toast }      = useToast();
 
   const [products, setProducts]   = useState<Product[]>([]);
   const [loading, setLoading]     = useState(true);
@@ -41,7 +42,7 @@ export default function WishlistPage() {
   const handleAddToCart = (product: Product) => {
     const firstVariant = product.variants.find(v => v.stock > 0);
     if (!firstVariant) {
-      toast.error("This item is currently out of stock.");
+      toast("This item is currently out of stock.", "error");
       return;
     }
     addToCart({
@@ -55,12 +56,12 @@ export default function WishlistPage() {
       color:       firstVariant.color,
       quantity:    1,
     });
-    toast.success(`${product.name} added to cart!`);
+    toast(`${product.name} added to cart!`, "success");
   };
 
   const handleRemove = (productId: string) => {
     toggleWishlist(productId);
-    toast.success("Removed from wishlist.");
+    toast("Removed from wishlist.", "info");
   };
 
   return (
