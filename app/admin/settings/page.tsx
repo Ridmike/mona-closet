@@ -7,12 +7,14 @@ import { getSiteSettings, saveSiteSettings, SiteSettings } from "@/lib/db/conten
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/shared/Toast";
 import { Sliders, Save, RefreshCw, AlertCircle, Sparkles, Megaphone } from "lucide-react";
+import { hasPermission } from "@/lib/rbac";
 
 export default function AdminSettingsPage() {
   const { profile } = useAuth();
   const { toast } = useToast();
 
-  const isOwnerOrManager = profile?.role === "Owner" || profile?.role === "Manager";
+  const canManageSettings = hasPermission(profile?.role, "manageSettings");
+  const canViewSettings   = hasPermission(profile?.role, "viewSettings");
 
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -35,8 +37,8 @@ export default function AdminSettingsPage() {
 
   const handleSave = async () => {
     if (!settings) return;
-    if (!isOwnerOrManager) {
-      toast("Access denied. Only Owners and Managers can edit site settings.", "error");
+    if (!canManageSettings) {
+      toast("Access denied. Only Owners can save site settings.", "error");
       return;
     }
 
@@ -81,7 +83,7 @@ export default function AdminSettingsPage() {
             Toggle visibility and control promotion elements across the storefront.
           </p>
         </div>
-        {isOwnerOrManager && (
+        {canManageSettings && (
           <Button
             onClick={handleSave}
             loading={saving}
@@ -120,7 +122,7 @@ export default function AdminSettingsPage() {
               <div className="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
                 <input
                   type="checkbox"
-                  disabled={!isOwnerOrManager}
+                  disabled={!canManageSettings}
                   checked={settings.showPromoTicker}
                   onChange={(e) => setSettings({ ...settings, showPromoTicker: e.target.checked })}
                   className="sr-only peer"
@@ -149,7 +151,7 @@ export default function AdminSettingsPage() {
               <div className="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
                 <input
                   type="checkbox"
-                  disabled={!isOwnerOrManager}
+                  disabled={!canManageSettings}
                   checked={settings.showSaleBanner}
                   onChange={(e) => setSettings({ ...settings, showSaleBanner: e.target.checked })}
                   className="sr-only peer"
@@ -166,10 +168,10 @@ export default function AdminSettingsPage() {
         </div>
 
         {/* Permissions warning banner */}
-        {!isOwnerOrManager && (
+        {!canManageSettings && (
           <div className="p-4 bg-amber-50 text-amber-800 text-xs font-body flex gap-2 items-center">
             <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
-            <span>You are logged in with a <strong>{profile?.role}</strong> role. Only Owners or Managers can change site-wide visibility rules.</span>
+            <span>You are logged in with a <strong>{profile?.role}</strong> role. Only Owners can change site-wide visibility rules.</span>
           </div>
         )}
 

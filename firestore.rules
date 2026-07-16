@@ -11,21 +11,27 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    // Helper to check if the authenticated user has administrative privileges
+    // Helper to check if the authenticated user has administrative privileges.
+    // Uses get() with an exists() guard to avoid errors when the user doc is missing.
     function isAdmin() {
       return isAuthenticated() && 
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'Owner' ||
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'Manager' ||
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'Staff');
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['Owner', 'Manager', 'Staff'];
+    }
+
+    // Shorthand: only Owner or Manager (not Staff)
+    function isOwnerOrManager() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['Owner', 'Manager'];
     }
 
     // Rules for the users collection
     match /users/{userId} {
       // Allow read to let guest checkouts query existing customer emails
       allow read: if true;
-      // Allow creating a customer profile document (e.g. guest conversion or sign-in)
-      allow create: if request.resource.data.role == 'Customer';
+      // Allow creating a customer profile document, or any profile if admin
+      allow create: if request.resource.data.role == 'Customer' || isAdmin();
       // Only the profile owner or admins can modify/delete it
       allow update: if isOwner(userId) || isAdmin();
       allow delete: if isAdmin();
@@ -38,7 +44,6 @@ service cloud.firestore {
       // Only admins can create/delete products
       allow create, delete: if isAdmin();
       // Admins can update anything. Authenticated users can update for stock deduction.
-      // Note: updateDoc sends partial fields, so request.resource.data.diff() cannot be used.
       allow update: if isAdmin() || isAuthenticated();
     }
 
@@ -77,11 +82,15 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Rules for the contact messages collection
+    // Rules for the contact messages collection.
+    // 'read' is a shorthand for 'get' (single doc) only.
+    // 'list' must be explicitly granted for getDocs() / collection queries.
     match /contact_messages/{msgId} {
-      // Anyone (even guests) can submit a contact message. Only admins can read/delete them.
+      // Anyone (even guests) can submit a contact message.
       allow create: if true;
-      allow read, update, delete: if isAdmin();
+      // Admins (Owner, Manager, Staff) can read individual docs AND run collection queries.
+      allow get, list: if isAdmin();
+      allow update, delete: if isAdmin();
     }
 
     // Rules for the settings collection

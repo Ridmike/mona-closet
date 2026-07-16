@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, collection, query, where, getDocs, deleteDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -45,12 +45,26 @@ export default function RegisterPage() {
       
       await updateProfile(currentUser, { displayName: name });
       
+      // Check if a user document with this email was pre-created (e.g., staff invite)
+      let initialRole = "Customer";
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("email", "==", email.trim().toLowerCase()));
+      const snap = await getDocs(q);
+      
+      if (!snap.empty) {
+        const preCreatedDoc = snap.docs[0];
+        initialRole = preCreatedDoc.data().role || "Customer";
+        if (preCreatedDoc.id !== currentUser.uid) {
+          await deleteDoc(doc(db, "users", preCreatedDoc.id));
+        }
+      }
+      
       await setDoc(doc(db, "users", currentUser.uid), {
         uid: currentUser.uid,
-        email: currentUser.email,
+        email: currentUser.email || email.trim().toLowerCase(),
         displayName: name,
         phone: phone,
-        role: "Customer",
+        role: initialRole,
         createdAt: new Date(),
       });
       
