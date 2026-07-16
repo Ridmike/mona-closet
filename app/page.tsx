@@ -438,8 +438,8 @@ export default function Home() {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`px-5 py-2 text-xs font-semibold font-body rounded-full capitalize transition-all duration-200 ${activeTab === tab
-                      ? "bg-brand-mauve text-white shadow-sm scale-105"
-                      : "text-brand-charcoal/65 hover:text-brand-charcoal hover:bg-white/60"
+                    ? "bg-brand-mauve text-white shadow-sm scale-105"
+                    : "text-brand-charcoal/65 hover:text-brand-charcoal hover:bg-white/60"
                     }`}
                 >
                   {tab === "tops & blouses" ? "Tops" : tab}
@@ -543,7 +543,7 @@ export default function Home() {
                 <div className="bg-brand-plum text-white p-6 rounded-2xl shadow-lg flex flex-col justify-between h-44 hover:bg-brand-mauve transition-colors duration-300 group">
                   <Sparkles className="w-6 h-6 text-brand-blush" />
                   <div>
-                    <h4 className="font-display text-xl font-medium leading-snug">Join thousands of fashion lovers across Sri Lanka</h4>
+                    <h4 className="font-display text-white/70 text-xl font-medium leading-snug">Join thousands of fashion lovers across Sri Lanka</h4>
                     <div className="flex items-center gap-2 mt-2 text-xs text-white/60 font-body">
                       <span>✓ Authentic</span>
                       <span>·</span>
