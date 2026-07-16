@@ -174,7 +174,7 @@ export default function Home() {
       {showPromoTicker && bannerVisible && (
         <div className="relative bg-gradient-to-r from-brand-plum via-brand-mauve to-brand-plum text-white overflow-hidden py-2.5">
           <div className="overflow-hidden">
-            <div className="animate-marquee gap-12 items-center">
+            <div className="flex flex-row whitespace-nowrap animate-marquee gap-12 items-center">
               {tickerText.map((item, i) => (
                 <span key={i} className="whitespace-nowrap text-xs font-semibold font-body tracking-wide px-8 flex items-center gap-2 shrink-0">
                   {item}
@@ -232,7 +232,7 @@ export default function Home() {
           priority
           loading="eager"
           sizes="100vw"
-          className="object-cover object-center scale-105 transition-transform duration-[12s] ease-out hover:scale-100"
+          className="object-cover object-top scale-105 transition-transform duration-[12s] ease-out hover:scale-100"
         />
         {/* Dual gradient overlay — left dark for text, right lighter */}
         <div className="absolute inset-0 bg-gradient-to-r from-brand-charcoal/90 via-brand-charcoal/55 to-transparent" />
