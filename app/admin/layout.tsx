@@ -23,6 +23,7 @@ import {
 import { getContactMessages } from "@/lib/db/content";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { hasPermission, type PermissionKey } from "@/lib/rbac";
 
 export default function AdminLayout({
   children,
@@ -104,16 +105,16 @@ export default function AdminLayout({
   };
 
   const navItems = [
-    { label: "Dashboard", href: "/admin",           icon: LayoutDashboard },
-    { label: "Products",  href: "/admin/products",  icon: ShoppingBag },
-    { label: "Categories",href: "/admin/categories",icon: FolderTree },
-    { label: "Inventory", href: "/admin/inventory", icon: Package },
-    { label: "Orders",    href: "/admin/orders",    icon: ClipboardList },
-    { label: "Customers", href: "/admin/customers", icon: Users },
-    { label: "Messages",  href: "/admin/messages",  icon: MessageSquare, badge: unreadMessages },
-    { label: "Staff Users",href: "/admin/users",   icon: Users, roles: ["Owner", "Manager"] },
-    { label: "Settings",  href: "/admin/settings",  icon: Settings },
-  ];
+    { label: "Dashboard",   href: "/admin",            icon: LayoutDashboard, permission: "viewDashboard"  },
+    { label: "Products",    href: "/admin/products",   icon: ShoppingBag,     permission: "viewProducts"   },
+    { label: "Categories",  href: "/admin/categories", icon: FolderTree,      permission: "viewCategories" },
+    { label: "Inventory",   href: "/admin/inventory",  icon: Package,         permission: "viewInventory"  },
+    { label: "Orders",      href: "/admin/orders",     icon: ClipboardList,   permission: "viewOrders"     },
+    { label: "Customers",   href: "/admin/customers",  icon: Users,           permission: "viewCustomers"  },
+    { label: "Messages",    href: "/admin/messages",   icon: MessageSquare,   permission: "viewMessages",  badge: unreadMessages },
+    { label: "Staff Users", href: "/admin/users",      icon: Users,           permission: "viewStaffUsers" },
+    { label: "Settings",    href: "/admin/settings",   icon: Settings,        permission: "viewSettings"   },
+  ] as const;
 
   return (
     <ProtectedRoute allowedRoles={["Owner", "Manager", "Staff"]}>
@@ -146,28 +147,29 @@ export default function AdminLayout({
             {/* Navigation links */}
             <nav className="flex flex-col gap-1.5">
               {navItems.map((item) => {
-                if (item.roles && profile && !item.roles.includes(profile.role)) {
+                // Gate each nav link by the role-based permission
+                if (!hasPermission(profile?.role, item.permission as PermissionKey)) {
                   return null;
                 }
-                
+
                 const Icon = item.icon;
                 const isActive = pathname === item.href;
-                
+
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-card text-sm font-medium transition-colors ${
-                      isActive 
-                        ? "bg-brand-mauve text-white shadow-md shadow-brand-mauve/25" 
+                      isActive
+                        ? "bg-brand-mauve text-white shadow-md shadow-brand-mauve/25"
                         : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
                     }`}
                   >
                     <Icon className="w-4 h-4 shrink-0" />
                     <span className="flex-1">{item.label}</span>
-                    {"badge" in item && (item.badge as number) > 0 && (
+                    {"badge" in item && (item as any).badge > 0 && (
                       <span className="bg-brand-mauve text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
-                        {(item.badge as number) > 99 ? "99+" : item.badge}
+                        {(item as any).badge > 99 ? "99+" : (item as any).badge}
                       </span>
                     )}
                   </Link>
