@@ -15,7 +15,33 @@ export interface UserProfile {
   email: string;
   displayName?: string;
   phone?: string;
-  role: "Owner" | "Manager" | "Staff" | "Customer";
+  /**
+   * Roles:
+   *  - SuperAdmin       → Full access (replaces "Owner")
+   *  - InventoryManager → Products, Categories, Inventory
+   *  - StaffManager     → Staff Users management
+   *  - ContentManager   → Products, Categories, Site Settings/Banners
+   *  - OrderManager     → Orders, Customers
+   *  - CustomerSupport  → Messages, Customers (view)
+   *  - Customer         → Storefront web user only
+   *
+   * Legacy aliases kept for backward compatibility:
+   *  - Owner   → treated as SuperAdmin
+   *  - Manager → treated as StaffManager (reassign ASAP)
+   *  - Staff   → treated as CustomerSupport (reassign ASAP)
+   */
+  role:
+    | "SuperAdmin"
+    | "InventoryManager"
+    | "StaffManager"
+    | "ContentManager"
+    | "OrderManager"
+    | "CustomerSupport"
+    | "Customer"
+    // Legacy aliases — kept for backward compatibility
+    | "Owner"
+    | "Manager"
+    | "Staff";
   createdAt: Date;
 }
 

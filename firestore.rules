@@ -11,19 +11,24 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    // Helper to check if the authenticated user has administrative privileges.
-    // Uses get() with an exists() guard to avoid errors when the user doc is missing.
+    // Helper: any authenticated user with an admin panel role.
+    // Includes all 6 specialist roles + legacy aliases for backward compatibility.
     function isAdmin() {
       return isAuthenticated() && 
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['Owner', 'Manager', 'Staff'];
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in [
+          'SuperAdmin', 'InventoryManager', 'StaffManager',
+          'ContentManager', 'OrderManager', 'CustomerSupport',
+          // Legacy aliases
+          'Owner', 'Manager', 'Staff'
+        ];
     }
 
-    // Shorthand: only Owner or Manager (not Staff)
-    function isOwnerOrManager() {
+    // Helper: top-level admins only (SuperAdmin / legacy Owner).
+    function isSuperAdmin() {
       return isAuthenticated() &&
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['Owner', 'Manager'];
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['SuperAdmin', 'Owner'];
     }
 
     // Rules for the users collection

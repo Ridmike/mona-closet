@@ -6,7 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles?: ("Owner" | "Manager" | "Staff" | "Customer")[];
+  allowedRoles?: import("@/context/AuthContext").UserProfile["role"][];
   redirectTo?: string;
 }
 
@@ -41,7 +41,7 @@ export function ProtectedRoute({
     if (allowedRoles && profile) {
       const hasAccess = allowedRoles.includes(profile.role);
       if (!hasAccess) {
-        if (profile.role === "Customer" && pathname.startsWith("/admin")) {
+        if (pathname.startsWith("/admin")) {
           router.push("/admin/login?error=unauthorized");
         } else {
           router.push("/");
