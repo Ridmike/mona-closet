@@ -23,7 +23,7 @@ import {
 import { getContactMessages } from "@/lib/db/content";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
-import { hasPermission, type PermissionKey } from "@/lib/rbac";
+import { hasPermission, type PermissionKey, ADMIN_ROLES, ROLE_LABELS } from "@/lib/rbac";
 
 export default function AdminLayout({
   children,
@@ -117,7 +117,7 @@ export default function AdminLayout({
   ] as const;
 
   return (
-    <ProtectedRoute allowedRoles={["Owner", "Manager", "Staff"]}>
+    <ProtectedRoute allowedRoles={ADMIN_ROLES}>
       <div className="flex h-screen bg-zinc-100 text-zinc-800 font-sans">
         
         {/* Sidebar */}
@@ -139,7 +139,7 @@ export default function AdminLayout({
                 <p className="text-sm font-bold truncate text-white">{profile.displayName || "Admin User"}</p>
                 <div className="flex items-center gap-1.5 mt-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                  <p className="text-xs text-zinc-400 capitalize font-medium">{profile.role}</p>
+                  <p className="text-xs text-zinc-400 font-medium">{ROLE_LABELS[profile.role] ?? profile.role}</p>
                 </div>
               </div>
             )}

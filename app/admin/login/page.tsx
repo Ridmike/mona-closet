@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
+import { ADMIN_ROLES } from "@/lib/rbac";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Mail, Lock, ShieldAlert, LogIn, ArrowLeft, CheckCircle2, XCircle, X } from "lucide-react";
@@ -39,7 +40,7 @@ function LoginForm() {
   };
 
   useEffect(() => {
-    if (user && profile && (profile.role === "Owner" || profile.role === "Manager" || profile.role === "Staff")) {
+    if (user && profile && ADMIN_ROLES.includes(profile.role)) {
       router.push("/admin");
     }
     const errParam = searchParams.get("error");
@@ -65,7 +66,7 @@ function LoginForm() {
       if (userDocSnap.exists()) {
         const data = userDocSnap.data();
         const role = data.role || "Customer";
-        if (role === "Owner" || role === "Manager" || role === "Staff") {
+        if (ADMIN_ROLES.includes(role)) {
           showToast("success", "Welcome back! Redirecting to dashboard…");
           setTimeout(() => router.push("/admin"), 1200);
         } else {
