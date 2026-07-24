@@ -1,7 +1,7 @@
 // components/products/ProductCard.tsx
 "use client";
 
-import Link  from "next/link";
+import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -12,28 +12,28 @@ import { useWishlistStore } from "@/store/useWishlistStore";
 import { useToast } from "@/components/shared/Toast";
 
 interface ProductCardProps {
-  product:   ProductCardData;
+  product: ProductCardData;
   className?: string;
 }
 
 export function ProductCard({ product, className }: ProductCardProps) {
   const router = useRouter();
   const { toast } = useToast();
-  const [hovered, setHovered]     = useState(false);
+  const [hovered, setHovered] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
 
-  const wishlistIds    = useWishlistStore(state => state.productIds);
+  const wishlistIds = useWishlistStore(state => state.productIds);
   const toggleWishlist = useWishlistStore(state => state.toggleWishlist);
-  const isWishlisted   = wishlistIds.includes(product.id);
+  const isWishlisted = wishlistIds.includes(product.id);
 
-  const finalPrice   = discountedPrice(product.price, product.discount);
-  const hasDiscount  = !!product.discount && product.discount > 0;
+  const finalPrice = discountedPrice(product.price, product.discount);
+  const hasDiscount = !!product.discount && product.discount > 0;
   const isOutOfStock = !product.inStock;
 
   return (
     <article
       className={cn(
-        "group relative flex flex-col bg-white rounded-2xl overflow-hidden",
+        "group relative flex flex-col bg-white rounded-md overflow-hidden",
         "border border-brand-sand/60 hover:border-brand-mauve/30",
         "shadow-sm hover:shadow-xl",
         "transition-all duration-400 ease-out",
@@ -77,12 +77,12 @@ export function ProductCard({ product, className }: ProductCardProps) {
         {/* ── Badges top-left ── */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
           {hasDiscount && (
-            <span className="bg-brand-mauve text-white text-[11px] font-semibold font-body px-2.5 py-1 rounded-full shadow-sm">
+            <span className="bg-brand-mauve text-white text-[11px] font-semibold font-body px-2.5 py-1 rounded-md shadow-sm">
               -{product.discount}%
             </span>
           )}
           {isOutOfStock && (
-            <span className="bg-brand-charcoal/80 backdrop-blur-sm text-white text-[11px] font-medium font-body px-2.5 py-1 rounded-full">
+            <span className="bg-brand-charcoal/80 backdrop-blur-sm text-white text-[11px] font-medium font-body px-2.5 py-1 rounded-xl">
               Sold Out
             </span>
           )}

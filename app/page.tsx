@@ -85,6 +85,7 @@ function LoginSuccessBannerDetector({ onTrigger }: { onTrigger: () => void }) {
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function Home() {
   const [activeTab, setActiveTab] = useState<"all" | "dresses" | "tops & blouses" | "accessories">("all");
+  const [activeStep, setActiveStep] = useState<number>(1);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [bannerVisible, setBannerVisible] = useState(true);
@@ -468,92 +469,179 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── LIFESTYLE / BRAND STRIP ───────────────────────────────────────── */}
-      <section className="py-20 md:py-28">
+      {/* ── HOW IT WORKS SECTION ─────────────────────────────────────────── */}
+      <section className="py-20 md:py-28 bg-white border-b border-brand-sand">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-16">
+            <span className="text-xs font-semibold uppercase tracking-widest text-brand-mauve font-body">Seamless Experience</span>
+            <h2 className="mt-2 text-3xl md:text-4xl font-display font-medium text-brand-plum">How It Works</h2>
+            <p className="text-sm font-body text-brand-charcoal/65 mt-2">
+              Born as a Facebook boutique, we built this website to make shopping instant while keeping the personal touch our community loves.
+            </p>
+          </div>
 
-            {/* Left: How it works */}
-            <div data-reveal className="reveal-left lg:col-span-5 space-y-7">
-              <div>
-                <span className="text-xs font-semibold uppercase tracking-widest text-brand-mauve font-body">How It Works</span>
-                <h2 className="mt-2 text-3xl md:text-4xl font-display font-medium text-brand-plum leading-tight">
-                  Social Shopping, Now Faster & More Reliable
-                </h2>
-                <p className="mt-3 text-base font-body text-brand-charcoal/75 leading-relaxed">
-                  Born as a Facebook boutique, we built this website to make shopping instant — while keeping the personal touch our community loves.
-                </p>
-              </div>
-              <ul className="space-y-5">
-                {[
-                  { n: "01", title: "Choose & Add to Cart", desc: "Pick size, colour, and add to cart in seconds." },
-                  { n: "02", title: "WhatsApp Confirmation", desc: "We confirm your order instantly on WhatsApp." },
-                  { n: "03", title: "Cash on Delivery", desc: "Pay only when your parcel is in your hands." },
-                ].map((step, i) => (
-                  <li key={i} className="flex gap-4 group">
-                    <span className="w-9 h-9 rounded-xl bg-brand-blush/30 text-brand-plum flex items-center justify-center shrink-0 font-bold text-sm font-body group-hover:bg-brand-blush group-hover:scale-110 transition-all duration-300">
-                      {step.n}
-                    </span>
-                    <div>
-                      <strong className="font-display text-brand-plum font-semibold text-base block">{step.title}</strong>
-                      <span className="text-sm font-body text-brand-charcoal/65">{step.desc}</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <a
-                href="https://www.facebook.com/profile.php?id=100088880144524"
-                target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm font-bold text-white bg-[#1877F2] hover:bg-[#166FE5] hover:scale-105 px-6 py-3 rounded-xl transition-all duration-200 font-body shadow-md"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
-                Visit Facebook Page
-              </a>
+          {/* Stepper container with progress bar */}
+          <div className="relative max-w-5xl mx-auto">
+            {/* Desktop progress bar connecting step nodes */}
+            <div className="absolute top-[52px] left-[16.6%] right-[16.6%] h-[3px] bg-brand-sand/30 hidden md:block z-0 rounded-full">
+              <div className="w-full h-full bg-brand-blush via-brand-mauve to-brand-plum rounded-full shadow-[0_0_12px_rgba(197,118,138,0.4)]" />
             </div>
 
-            {/* Right: Reviews */}
-            <div data-reveal className="reveal-right lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-5 relative">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-brand-blush/25 rounded-full blur-3xl pointer-events-none -z-10" />
+            {/* Mobile progress bar connecting step nodes */}
+            <div className="absolute top-[48px] bottom-[48px] left-1/2 w-[3px] -translate-x-1/2 bg-brand-sand/30 md:hidden z-0 rounded-full">
+              <div className="w-full h-full bg-gradient-to-b from-brand-blush via-brand-mauve to-brand-plum rounded-full shadow-[0_0_12px_rgba(197,118,138,0.4)]" />
+            </div>
 
-              <div className="space-y-5">
-                {REVIEWS.slice(0, 2).map((r, i) => (
-                  <div key={i} className="bg-white p-5 rounded-2xl shadow-md border border-brand-sand/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                    <div className="text-amber-400 text-sm mb-2">{"★".repeat(r.rating)}</div>
-                    <p className="text-sm font-body text-brand-charcoal/80 italic leading-relaxed">"{r.comment}"</p>
-                    <div className="mt-4 pt-3 border-t border-brand-sand/30 flex justify-between items-center text-xs">
-                      <strong className="font-body text-brand-plum font-semibold">{r.name}</strong>
-                      <span className="font-body text-brand-charcoal/40">{r.location}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 relative z-10">
+              {[
+                {
+                  n: "01",
+                  title: "Choose & Add to Cart",
+                  desc: "Browse our collections, select your perfect size & color, and add to cart in under 60 seconds.",
+                  icon: (
+                    <svg className="w-5 h-5 text-brand-plum shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                  )
+                },
+                {
+                  n: "02",
+                  title: "WhatsApp Confirmation",
+                  desc: "We verify your details directly on WhatsApp to ensure correct sizing and address before shipping.",
+                  icon: (
+                    <svg className="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                      <path fillRule="evenodd" d="M12 2C6.48 2 2 6.48 2 12c0 2.17.76 4.19 2.04 5.79L3 22l4.41-1.35C8.89 21.41 10.4 21.8 12 21.8c5.52 0 10-4.48 10-10S17.52 2 12 2zm4.75 14.25c-.24.68-1.2 1.25-1.9 1.34-.62.08-1.44.13-3.79-.84-3-1.23-4.9-4.27-5.05-4.47-.15-.2-1.22-1.63-1.22-3.11 0-1.48.77-2.2 1.04-2.5.24-.26.63-.37.98-.37h.54c.24 0 .49-.03.7.46.24.57.84 2.06.92 2.22.08.16.14.35.03.57-.11.22-.16.35-.33.54-.16.19-.35.43-.5.58-.16.19-.35.43-.5.58-.16.16-.33.34-.14.67.19.33.85 1.39 1.83 2.26.82.73 1.5 1.17 1.83 1.34.33.16.52.14.7-.08.19-.24.81-.95 1.03-1.27.22-.32.43-.27.73-.16.3.11 1.9.9 2.23 1.06.33.16.54.24.62.38.08.14.08.82-.16 1.5z" clipRule="evenodd" />
+                    </svg>
+                  )
+                },
+                {
+                  n: "03",
+                  title: "Cash on Delivery",
+                  desc: "Pay in cash only when your order is safely delivered to your doorstep. Free delivery islandwide.",
+                  icon: (
+                    <svg className="w-5 h-5 text-brand-plum shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )
+                }
+              ].map((step, index) => {
+                return (
+                  <div
+                    key={index}
+                    className="relative flex flex-col items-center group"
+                  >
+                    {/* Card wrapper */}
+                    <div className="w-full max-w-[320px] h-[320px] flex flex-col items-center text-center justify-center gap-4 p-6 md:p-8 bg-white rounded-3xl border border-brand-mauve shadow-lg transition-all duration-350 relative z-10 mx-auto hover:-translate-y-1.5">
 
-              <div className="space-y-5 md:mt-8">
-                {REVIEWS.slice(2).map((r, i) => (
-                  <div key={i} className="bg-white p-5 rounded-2xl shadow-md border border-brand-sand/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                    <div className="text-amber-400 text-sm mb-2">{"★".repeat(r.rating)}</div>
-                    <p className="text-sm font-body text-brand-charcoal/80 italic leading-relaxed">"{r.comment}"</p>
-                    <div className="mt-4 pt-3 border-t border-brand-sand/30 flex justify-between items-center text-xs">
-                      <strong className="font-body text-brand-plum font-semibold">{r.name}</strong>
-                      <span className="font-body text-brand-charcoal/40">{r.location}</span>
+                      {/* Number Badge Circle */}
+                      <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm shrink-0 transition-all duration-300 relative bg-gradient-to-br from-brand-mauve to-brand-plum text-brand-blush scale-110 shadow-[0_0_12px_rgba(125,53,80,0.4)]">
+                        {step.n}
+                        <div className="absolute -inset-1 rounded-full border-2 border-brand-mauve animate-ping opacity-75 pointer-events-none" />
+                      </div>
+
+                      {/* Content text */}
+                      <div className="space-y-1.5">
+                        <div className="flex items-center gap-2 justify-center mb-1">
+                          <span className="p-1.5 rounded-lg bg-brand-blush/20 text-brand-plum">
+                            {step.icon}
+                          </span>
+                          <h3 className="font-display font-semibold text-lg md:text-xl text-brand-plum">
+                            {step.title}
+                          </h3>
+                        </div>
+                        <p className="text-xs md:text-sm font-body text-brand-charcoal/65 leading-relaxed">
+                          {step.desc}
+                        </p>
+                      </div>
+
                     </div>
                   </div>
-                ))}
-                {/* Brand card */}
-                <div className="bg-brand-plum text-white p-6 rounded-2xl shadow-lg flex flex-col justify-between h-44 hover:bg-brand-mauve transition-colors duration-300 group">
-                  <Sparkles className="w-6 h-6 text-brand-blush" />
-                  <div>
-                    <h4 className="font-display text-white/70 text-xl font-medium leading-snug">Join thousands of fashion lovers across Sri Lanka</h4>
-                    <div className="flex items-center gap-2 mt-2 text-xs text-white/60 font-body">
-                      <span>✓ Authentic</span>
-                      <span>·</span>
-                      <span>✓ Secure COD</span>
-                      <span>·</span>
-                      <span>✓ Weekly Drops</span>
-                    </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Social Proof CTA */}
+          <div className="flex flex-col items-center gap-4 mt-16">
+            <p className="text-xs font-semibold text-brand-charcoal/50 font-body uppercase tracking-wider">
+              Need assistance? We are active daily on Facebook
+            </p>
+            <a
+              href="https://www.facebook.com/profile.php?id=100088880144524"
+              target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm font-bold text-white bg-[#1877F2] hover:bg-[#166FE5] hover:scale-105 px-6 py-3 rounded-xl transition-all duration-200 font-body shadow-md"
+            >
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
+              Visit Our Facebook Page
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ── TESTIMONIALS SECTION ─────────────────────────────────────────── */}
+      <section className="py-20 md:py-28 bg-brand-mist">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-16">
+            <span className="text-xs font-semibold uppercase tracking-widest text-brand-mauve font-body">Our Community</span>
+            <h2 className="mt-2 text-3xl md:text-4xl font-display font-medium text-brand-plum">Loved by Sri Lankan Women</h2>
+            <p className="text-sm font-body text-brand-charcoal/65 mt-2">
+              Don't just take our word for it — read reviews from our happy customers across the island.
+            </p>
+          </div>
+
+          {/* Testimonial grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
+            {/* Background design blob */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-brand-blush/20 rounded-full blur-3xl pointer-events-none -z-10" />
+
+            {REVIEWS.map((r, i) => (
+              <div
+                key={i}
+                className="bg-white p-8 rounded-3xl shadow-sm border border-brand-sand/40 hover:shadow-lg hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
+              >
+                <div>
+                  {/* Star Rating */}
+                  <div className="flex gap-1 mb-4">
+                    {Array.from({ length: r.rating }).map((_, idx) => (
+                      <Star key={idx} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                    ))}
                   </div>
+                  <p className="text-sm font-body text-brand-charcoal/80 italic leading-relaxed">
+                    "{r.comment}"
+                  </p>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-brand-sand/35 flex justify-between items-center text-xs">
+                  <strong className="font-body text-brand-plum font-semibold text-sm">
+                    {r.name}
+                  </strong>
+                  <span className="font-body text-brand-charcoal/40 font-medium">
+                    {r.location}
+                  </span>
                 </div>
               </div>
+            ))}
+          </div>
+
+          {/* Join CTA Brand strip */}
+          <div className="mt-16 max-w-4xl mx-auto bg-brand-plum text-white p-8 md:p-10 rounded-3xl shadow-xl hover:bg-brand-mauve transition-colors duration-300 flex flex-col md:flex-row md:items-center justify-between gap-6 group">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-6 h-6 text-brand-blush" />
+                <h4 className="font-display text-white text-2xl font-medium leading-snug">
+                  Join the Mona's Closet Family
+                </h4>
+              </div>
+              <p className="text-sm font-body text-white/70 max-w-lg">
+                Join thousands of fashion lovers across Sri Lanka who choose us for premium quality linen, dresses, and prompt islandwide COD.
+              </p>
+            </div>
+            <div className="flex items-center gap-4 text-xs font-body font-semibold tracking-wider uppercase text-brand-blush whitespace-nowrap">
+              <span>✓ Authentic</span>
+              <span>·</span>
+              <span>✓ Secure COD</span>
+              <span>·</span>
+              <span>✓ Weekly Drops</span>
             </div>
           </div>
         </div>
@@ -565,7 +653,7 @@ export default function Home() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] border border-white/5 rounded-full pointer-events-none" />
         <div className="absolute -top-16 -right-16 w-64 h-64 bg-brand-mauve/40 rounded-full blur-3xl pointer-events-none" />
 
-        <div data-reveal className="reveal relative z-10 max-w-2xl mx-auto px-4 text-center space-y-6">
+        <div className="relative z-10 max-w-2xl mx-auto px-4 text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-blush/15 border border-brand-blush/30 text-brand-blush text-xs font-semibold uppercase tracking-widest font-body">
             <Heart className="w-3.5 h-3.5" /> Stay Connected
           </div>
