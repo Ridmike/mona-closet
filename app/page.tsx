@@ -84,7 +84,7 @@ function LoginSuccessBannerDetector({ onTrigger }: { onTrigger: () => void }) {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<"all" | "dresses" | "tops & blouses" | "accessories">("all");
+  const [activeTab, setActiveTab] = useState<"all" | "dresses" | "tops & blouses" | "t-shirts" | "denims" | "accessories">("all");
   const [activeStep, setActiveStep] = useState<number>(1);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -433,19 +433,21 @@ export default function Home() {
             <p className="text-sm font-body text-brand-charcoal/65 mt-2">Our highest-rated items and latest collections.</p>
 
             {/* Filter tabs */}
-            <div className="flex gap-2 mt-6 p-1 bg-brand-sand/60 rounded-full border border-brand-sand/80 flex-wrap justify-center">
-              {(["all", "dresses", "tops & blouses", "accessories"] as const).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-5 py-2 text-xs font-semibold font-body rounded-full capitalize transition-all duration-200 ${activeTab === tab
-                    ? "bg-brand-mauve text-white shadow-sm scale-105"
-                    : "text-brand-charcoal/65 hover:text-brand-charcoal hover:bg-white/60"
-                    }`}
-                >
-                  {tab === "tops & blouses" ? "Tops" : tab}
-                </button>
-              ))}
+            <div className="w-full max-w-md mx-auto overflow-x-auto scrollbar-none mt-6">
+              <div className="flex gap-2 p-1 bg-brand-sand/60 rounded-full border border-brand-sand/80 w-max min-w-full justify-start md:justify-center px-2 md:px-1 whitespace-nowrap">
+                {(["all", "dresses", "tops & blouses", "t-shirts", "denims", "accessories"] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-5 py-2 text-xs font-semibold font-body rounded-full capitalize transition-all duration-200 shrink-0 ${activeTab === tab
+                      ? "bg-brand-mauve text-white shadow-sm scale-105"
+                      : "text-brand-charcoal/65 hover:text-brand-charcoal hover:bg-white/60"
+                      }`}
+                  >
+                    {tab === "tops & blouses" ? "Tops" : tab}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
